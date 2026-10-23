@@ -7,7 +7,7 @@ enum class Mode { WALK, BUS, METRO, AUTO }
 /** Where a time or fare comes from. Shown next to every number in the app. */
 enum class Basis { TIMETABLE, OFFICIAL_FARE, REPORTED, ESTIMATE, MAP_ROUTE }
 
-enum class JourneyKind { BUS_METRO, AUTO_METRO, AUTO_DIRECT }
+enum class JourneyKind { BUS_METRO, AUTO_METRO, AUTO_DIRECT, METRO }
 
 enum class Confidence { HIGH, MEDIUM, LOW }
 
@@ -19,6 +19,8 @@ sealed interface Caution {
     data object AutoAvailabilityUnknown : Caution
     data object AutoNightSurcharge : Caution
     data class FailedRouteMayRepeat(val route: String) : Caution
+    /** No road distance is known for this auto ride, so it is worked out from the straight line. */
+    data object AutoDistanceEstimated : Caution
 }
 
 data class Leg(
@@ -121,6 +123,33 @@ class JourneyPlanner(private val corridor: Corridor) {
         )
     }
 
+    /**
+     * Journeys for a rider at the transfer metro station whose train was missed, or who finds the
+     * metro not running ([metroUnavailable]): the next train, and an auto from the station.
+     */
+    fun fromTransferJourneys(destinationId: String, nowMin: Int, metroUnavailable: Boolean): Pair<List<Journey>, List<Unavailable>> {
+        val destination = corridor.destination(destinationId)
+        val transfer = corridor.station(corridor.metro.transferStation)
+        val journeys = mutableListOf<Journey>()
+        val unavailable = mutableListOf<Unavailable>()
+        if (!metroUnavailable) {
+            val chain = Chain(nowMin)
+            if (addMetroAndWalk(chain, destination, missedTrain = true)) {
+                journeys += chain.toJourney(JourneyKind.METRO, busRoute = null)
+            } else {
+                val service = corridor.metro.service
+                unavailable += Unavailable(JourneyKind.METRO, null, service.firstTrain, service.lastTrainLatest)
+            }
+        }
+        val direct = Chain(nowMin)
+        // Roads are rarely straight; 1.35 is a common detour factor for city streets.
+        val km = straightKm(transfer.lat, transfer.lon, destination.lat, destination.lon) * ROAD_DETOUR
+        direct.caution(Caution.AutoDistanceEstimated, uncertainty = 0.2)
+        addAuto(direct, "${transfer.name} Metro", destination.name, km, freeFlowMin = 0.0)
+        journeys += direct.toJourney(JourneyKind.AUTO_DIRECT, busRoute = null)
+        return journeys to unavailable
+    }
+
     private fun build(
         fromName: String,
         accessOptions: List<AccessOption>,
@@ -207,8 +236,11 @@ class JourneyPlanner(private val corridor: Corridor) {
         )
     }
 
-    /** Adds the metro ride and final walk. Returns false when the metro is not running. */
-    private fun addMetroAndWalk(chain: Chain, destination: Destination): Boolean {
+    /**
+     * Adds the metro ride and final walk. Returns false when the metro is not running.
+     * After a [missedTrain] the wait is a full gap between trains rather than half of one.
+     */
+    private fun addMetroAndWalk(chain: Chain, destination: Destination, missedTrain: Boolean = false): Boolean {
         val service = corridor.metro.service
         val timeOfDay = Math.floorMod(chain.t, MINUTES_PER_DAY)
         if (!isWithin(timeOfDay, parseClock(service.firstTrain), parseClock(service.lastTrainLatest))) return false
@@ -223,7 +255,7 @@ class JourneyPlanner(private val corridor: Corridor) {
         chain.uncertainty += 0.1
         chain.add(
             Mode.METRO, transfer.name, station.name, route = corridor.metro.line,
-            wait = headway / 2, move = rideKm / corridor.assumptions.metroAvgSpeedKmh * 60,
+            wait = if (missedTrain) headway else headway / 2, move = rideKm / corridor.assumptions.metroAvgSpeedKmh * 60,
             distanceM = (rideKm * 1000).roundToInt(), fare = station.fareFromRamwadi,
             timeBasis = Basis.ESTIMATE, fareBasis = Basis.OFFICIAL_FARE,
         )
@@ -281,5 +313,14 @@ class JourneyPlanner(private val corridor: Corridor) {
 
     private companion object {
         const val DEFAULT_BUS_HEADWAY_MIN = 30.0
+        const val ROAD_DETOUR = 1.35
+
+        fun straightKm(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+            val dLat = Math.toRadians(lat2 - lat1)
+            val dLon = Math.toRadians(lon2 - lon1)
+            val h = Math.sin(dLat / 2).let { it * it } +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2).let { it * it }
+            return 2 * 6371.0 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h))
+        }
     }
 }

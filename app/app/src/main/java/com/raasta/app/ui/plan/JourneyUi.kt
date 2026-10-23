@@ -3,9 +3,7 @@ package com.raasta.app.ui.plan
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -45,7 +42,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.raasta.app.R
@@ -60,8 +56,6 @@ import com.raasta.app.planner.Leg
 import com.raasta.app.planner.MINUTES_PER_DAY
 import com.raasta.app.planner.Mode
 import com.raasta.app.planner.PlanResult
-import com.raasta.app.planner.Priority
-import com.raasta.app.planner.RankedJourney
 import com.raasta.app.planner.Source
 import com.raasta.app.planner.versusWaiting
 import com.raasta.app.ui.theme.AttentionAmber
@@ -136,71 +130,6 @@ fun ModeStrip(journey: Journey) {
                     }
                 }
             }
-        }
-    }
-}
-
-/** One route option, Uber "choose a ride" style. */
-@Composable
-fun OptionRow(
-    ranked: RankedJourney,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    /** Safety score of this option's safety route, once worked out. */
-    safetyScore: Int? = null,
-) {
-    val journey = ranked.journey
-    val shape = RoundedCornerShape(18.dp)
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .then(
-                if (selected) {
-                    Modifier
-                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                        .border(BorderStroke(2.dp, ElectricLime), shape)
-                } else Modifier,
-            )
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-            Text(
-                journeyTitle(journey.kind, journey.busRoute, journey.retriesFailedRoute),
-                style = MaterialTheme.typography.titleMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            ModeStrip(journey)
-            Text(
-                stringResource(R.string.option_arrive, clock(journey.arriveMin), journey.waitMin),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            if (ranked.highlights.isNotEmpty() || journey.confidence != Confidence.HIGH || safetyScore != null) {
-                Row(
-                    modifier = Modifier.horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
-                    ranked.highlights.sortedBy { it.ordinal }.forEach {
-                        Tag(stringResource(highlightLabel(it)), ElectricLime, outlined = true)
-                    }
-                    ConfidenceTag(journey.confidence)
-                    safetyScore?.let { Tag(stringResource(R.string.safety_tag, it), safetyColor(it), outlined = true) }
-                }
-            }
-        }
-        Spacer(Modifier.width(10.dp))
-        Column(horizontalAlignment = Alignment.End) {
-            Text(stringResource(R.string.journey_fare, journey.fare), style = MaterialTheme.typography.titleLarge)
-            Text(
-                stringResource(R.string.journey_minutes, journey.totalMin),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
     }
 }
@@ -386,6 +315,7 @@ internal fun journeyTitle(kind: JourneyKind, busRoute: String?, retriesFailedRou
     )
     JourneyKind.AUTO_METRO -> stringResource(R.string.journey_auto_metro)
     JourneyKind.AUTO_DIRECT -> stringResource(R.string.journey_auto_direct)
+    JourneyKind.METRO -> stringResource(R.string.journey_metro)
 }
 
 @Composable
@@ -404,14 +334,7 @@ internal fun cautionText(caution: Caution): String = when (caution) {
     Caution.AutoAvailabilityUnknown -> stringResource(R.string.caution_auto_availability)
     Caution.AutoNightSurcharge -> stringResource(R.string.caution_auto_night)
     is Caution.FailedRouteMayRepeat -> stringResource(R.string.caution_failed_route, displayRoute(caution.route))
-}
-
-@StringRes
-internal fun priorityLabel(priority: Priority): Int = when (priority) {
-    Priority.BALANCED -> R.string.priority_balanced
-    Priority.CHEAPEST -> R.string.priority_cheapest
-    Priority.LEAST_WAITING -> R.string.priority_least_waiting
-    Priority.FEWEST_CHANGES -> R.string.priority_fewest_changes
+    Caution.AutoDistanceEstimated -> stringResource(R.string.caution_auto_distance)
 }
 
 @StringRes

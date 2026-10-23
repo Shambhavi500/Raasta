@@ -55,31 +55,28 @@ import com.raasta.app.map.LatLon
 import com.raasta.app.map.distanceLabel
 import com.raasta.app.map.distanceM
 import com.raasta.app.ui.TripViewModel
-import com.raasta.app.ui.common.TimePill
 import com.raasta.app.ui.home.PlaceRow
-import com.raasta.app.ui.plan.LeaveTimeDialog
-import com.raasta.app.ui.plan.clock
 import com.raasta.app.ui.theme.ElectricLime
 
 private data class Suggestion(val id: String, val name: String, val subtitle: String, val keywords: String)
 
-/** Pickup and drop fields with live suggestions, like a ride-hailing search. */
+/** Starting point and destination fields with live suggestions. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(vm: TripViewModel, onBack: () -> Unit, onDone: () -> Unit) {
+fun SearchScreen(vm: TripViewModel, editFrom: Boolean, onBack: () -> Unit, onDone: () -> Unit) {
     val corridor = vm.corridor
-    var pickupQuery by rememberSaveable { mutableStateOf("") }
-    var dropQuery by rememberSaveable { mutableStateOf("") }
-    var editingPickup by rememberSaveable { mutableStateOf(false) }
-    var showTime by rememberSaveable { mutableStateOf(false) }
-    val dropFocus = remember { FocusRequester() }
+    var fromQuery by rememberSaveable { mutableStateOf("") }
+    var toQuery by rememberSaveable { mutableStateOf("") }
+    var editingFrom by rememberSaveable { mutableStateOf(editFrom) }
+    val fromFocus = remember { FocusRequester() }
+    val toFocus = remember { FocusRequester() }
     val origin = corridor.origin(vm.originId)
     val here = LatLon(origin.lat, origin.lon)
 
-    val pickups = corridor.origins.map {
-        Suggestion(it.id, it.name, stringResource(R.string.search_pickup_subtitle), it.name)
+    val starts = corridor.origins.map {
+        Suggestion(it.id, it.name, stringResource(R.string.search_from_subtitle), it.name)
     }
-    val drops = corridor.destinations.map {
+    val ends = corridor.destinations.map {
         Suggestion(
             it.id,
             it.name,
@@ -87,12 +84,12 @@ fun SearchScreen(vm: TripViewModel, onBack: () -> Unit, onDone: () -> Unit) {
             "${it.name} ${it.metroStation} Pune",
         )
     }
-    val query = if (editingPickup) pickupQuery else dropQuery
-    val shown = (if (editingPickup) pickups else drops).filter { suggestion ->
+    val query = if (editingFrom) fromQuery else toQuery
+    val shown = (if (editingFrom) starts else ends).filter { suggestion ->
         query.isBlank() || query.trim().split(" ").all { word -> suggestion.keywords.contains(word, ignoreCase = true) }
     }
 
-    LaunchedEffect(Unit) { dropFocus.requestFocus() }
+    LaunchedEffect(Unit) { (if (editFrom) fromFocus else toFocus).requestFocus() }
 
     Scaffold(
         topBar = {
@@ -123,33 +120,30 @@ fun SearchScreen(vm: TripViewModel, onBack: () -> Unit, onDone: () -> Unit) {
                 RouteDots(Modifier.padding(start = 18.dp, end = 6.dp))
                 Column(Modifier.weight(1f)) {
                     SearchField(
-                        value = pickupQuery,
-                        onValueChange = { pickupQuery = it },
+                        value = fromQuery,
+                        onValueChange = { fromQuery = it },
                         placeholder = origin.name,
-                        modifier = Modifier.onFocusChanged { if (it.isFocused) editingPickup = true },
+                        modifier = Modifier
+                            .focusRequester(fromFocus)
+                            .onFocusChanged { if (it.isFocused) editingFrom = true },
                     )
                     SearchField(
-                        value = dropQuery,
-                        onValueChange = { dropQuery = it },
-                        placeholder = stringResource(R.string.home_where_to),
+                        value = toQuery,
+                        onValueChange = { toQuery = it },
+                        placeholder = stringResource(R.string.home_to_hint),
                         modifier = Modifier
-                            .focusRequester(dropFocus)
-                            .onFocusChanged { if (it.isFocused) editingPickup = false },
+                            .focusRequester(toFocus)
+                            .onFocusChanged { if (it.isFocused) editingFrom = false },
                         onDone = { shown.singleOrNull()?.let { vm.chooseDestination(it.id); onDone() } },
                     )
                 }
             }
-            Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                TimePill(
-                    vm.departAt?.let { stringResource(R.string.leave_at_time, clock(it)) } ?: stringResource(R.string.leave_now_short),
-                    onClick = { showTime = true },
-                )
-            }
             LazyColumn(
+                modifier = Modifier.padding(top = 8.dp),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                if (editingPickup) {
+                if (editingFrom) {
                     item {
                         Row(
                             Modifier.padding(vertical = 8.dp),
@@ -157,7 +151,7 @@ fun SearchScreen(vm: TripViewModel, onBack: () -> Unit, onDone: () -> Unit) {
                         ) {
                             Icon(Icons.Filled.MyLocation, contentDescription = null, tint = ElectricLime)
                             Spacer(Modifier.width(12.dp))
-                            Text(stringResource(R.string.search_pickup_hint), style = MaterialTheme.typography.labelLarge)
+                            Text(stringResource(R.string.search_from_hint), style = MaterialTheme.typography.labelLarge)
                         }
                     }
                 }
@@ -166,11 +160,15 @@ fun SearchScreen(vm: TripViewModel, onBack: () -> Unit, onDone: () -> Unit) {
                         title = suggestion.name,
                         subtitle = suggestion.subtitle,
                         onClick = {
-                            if (editingPickup) {
+                            if (editingFrom) {
                                 vm.originId = suggestion.id
-                                pickupQuery = ""
-                                editingPickup = false
-                                dropFocus.requestFocus()
+                                fromQuery = ""
+                                if (vm.destinationId != null) {
+                                    onDone()
+                                } else {
+                                    editingFrom = false
+                                    toFocus.requestFocus()
+                                }
                             } else {
                                 vm.chooseDestination(suggestion.id)
                                 onDone()
@@ -190,14 +188,6 @@ fun SearchScreen(vm: TripViewModel, onBack: () -> Unit, onDone: () -> Unit) {
                 }
             }
         }
-    }
-
-    if (showTime) {
-        LeaveTimeDialog(
-            initialMinute = vm.startMinute,
-            onPick = { vm.departAt = it; showTime = false },
-            onDismiss = { showTime = false },
-        )
     }
 }
 
@@ -230,7 +220,7 @@ private fun SearchField(
     )
 }
 
-/** Pickup dot, connector line and drop square, as in ride-hailing apps. */
+/** Start dot, connector line and destination square. */
 @Composable
 private fun RouteDots(modifier: Modifier = Modifier) {
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {

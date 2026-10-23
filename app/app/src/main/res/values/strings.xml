@@ -19,38 +19,21 @@
     <!-- Home -->
     <string name="home_signed_in_as">Signed in as %1$s</string>
     <string name="home_sign_out">Sign out</string>
-    <string name="home_question">What do you need right now?</string>
-    <string name="home_plan_title">Plan my trip</string>
-    <string name="home_plan_subtitle">Compare bus, metro and auto options</string>
-    <string name="home_recover_title">Bus didn\'t show up?</string>
-    <string name="home_recover_subtitle">Find another way from your stop</string>
 
     <!-- Trip planning -->
     <string name="plan_corridor_note">Demo corridor: %1$s. Data built on %2$s.</string>
     <string name="plan_from">From</string>
     <string name="plan_to">To</string>
-    <string name="plan_leave_at">Leave at</string>
-    <string name="plan_priority">What matters most</string>
-    <string name="leave_now">Now (%1$s)</string>
-    <string name="leave_1800">6:00 PM</string>
-    <string name="leave_2130">9:30 PM</string>
-    <string name="leave_2330">11:30 PM</string>
-    <string name="priority_balanced">Balanced</string>
-    <string name="priority_cheapest">Cheapest</string>
-    <string name="priority_least_waiting">Least waiting</string>
-    <string name="priority_fewest_changes">Fewest changes</string>
-    <string name="plan_results_header">%1$d options, best first</string>
     <string name="plan_no_results">No options found for this time.</string>
 
     <string name="journey_bus_metro">Bus %1$s + Metro</string>
     <string name="journey_auto_metro">Auto + Metro</string>
     <string name="journey_auto_direct">Auto all the way</string>
+    <string name="journey_metro">Next metro</string>
     <string name="journey_arrive">Leave %1$s · arrive %2$s</string>
     <string name="journey_minutes">%1$d min</string>
     <string name="journey_fare">₹%1$d</string>
     <string name="journey_metrics">Wait %1$d min · Walk %2$s · %3$d change(s)</string>
-    <string name="journey_show_steps">Show steps</string>
-    <string name="journey_hide_steps">Hide steps</string>
 
     <string name="confidence_high">High confidence</string>
     <string name="confidence_medium">Medium confidence</string>
@@ -60,10 +43,6 @@
     <string name="highlight_least_waiting">Least waiting</string>
     <string name="highlight_fewest_changes">Fewest changes</string>
 
-    <string name="mode_walk">WALK</string>
-    <string name="mode_bus">BUS</string>
-    <string name="mode_metro">METRO</string>
-    <string name="mode_auto">AUTO</string>
     <string name="leg_walk">Walk to %1$s</string>
     <string name="leg_bus">Bus %1$s to %2$s</string>
     <string name="leg_metro">%1$s to %2$s</string>
@@ -82,13 +61,9 @@
     <string name="caution_metro_last_train">Last metro is reported as 10–11 PM. Check before relying on it.</string>
     <string name="caution_auto_availability">Auto availability and pickup time are not known.</string>
     <string name="caution_auto_night">Includes the 25% night surcharge (12 AM–5 AM).</string>
-
-    <string name="unavailable_header">Not available at this time</string>
-    <string name="unavailable_metro">%1$s: you would reach the metro after it stops running (reported hours %2$s–%3$s).</string>
+    <string name="caution_auto_distance">No road distance is known for this ride, so it is estimated from the straight-line distance.</string>
 
     <string name="sources_header">Where these numbers come from</string>
-    <string name="sources_show">Show sources</string>
-    <string name="sources_hide">Hide sources</string>
     <string name="source_retrieved">Retrieved %1$s</string>
 
     <string name="distance_m">%1$d m</string>
@@ -96,15 +71,6 @@
     <string name="clock_next_day">%1$s (+1 day)</string>
 
     <!-- Journey recovery -->
-    <string name="recover_intro">Tell us where you are and which bus did not come. Raasta compares waiting with every other way to get there.</string>
-    <string name="recover_at">I\'m at (bus stop)</string>
-    <string name="recover_failed_bus">Bus that did not come</string>
-    <string name="recover_going_to">Going to</string>
-    <string name="recover_time_now">Time now</string>
-    <string name="recover_now">Now (%1$s)</string>
-    <string name="recover_1840">6:40 PM</string>
-    <string name="recover_2150">9:50 PM</string>
-    <string name="recover_2240">10:40 PM</string>
     <string name="recover_bus_route">Bus %1$s</string>
     <string name="recover_title_switch">Don\'t wait for bus %1$s</string>
     <string name="recover_title_wait">Waiting for bus %1$s is still your best option</string>
@@ -118,37 +84,26 @@
     <string name="journey_keep_waiting">Keep waiting for bus %1$s</string>
     <string name="caution_failed_route">Bus %1$s just did not come; the next one may also be late or missing.</string>
 
-    <!-- Map home -->
+    <!-- Home -->
     <string name="home_account">Account</string>
-    <string name="home_where_to">Where to?</string>
-    <string name="home_you_are_at">Pickup: %1$s</string>
     <string name="home_place_subtitle">Near %1$s Metro · %2$s</string>
     <string name="map_recenter">Re-center map</string>
     <string name="leave_now_short">Now</string>
-    <string name="leave_at_time">%1$s</string>
     <string name="time_dialog_title">When do you want to leave?</string>
     <string name="time_dialog_set">Set time</string>
     <string name="time_dialog_now">Leave now</string>
 
     <!-- Search -->
-    <string name="search_title">Plan your trip</string>
-    <string name="search_pickup_subtitle">Kharadi, Pune</string>
-    <string name="search_pickup_hint">Choose a pickup point</string>
+    <string name="search_title">Plan a journey</string>
     <string name="search_no_match">No matches. This demo covers %1$s.</string>
     <string name="search_clear">Clear</string>
 
-    <!-- Route options -->
-    <string name="options_title">Choose a route</string>
-    <string name="options_title_recover">Another way from here</string>
+    <!-- Route comparison -->
     <string name="options_route">%1$s → %2$s</string>
-    <string name="option_arrive">Arrive %1$s · %2$d min waiting</string>
-    <string name="options_details">Details</string>
-    <string name="options_start">Start trip · %1$s</string>
-    <string name="options_metro_closed">%1$d bus and metro route(s) not running now</string>
+    <string name="options_metro_closed">%1$d bus and metro route(s) not running at this time</string>
     <string name="options_metro_hours">Aqua Line runs about %1$s–%2$s.</string>
-    <string name="options_change_time">Change time</string>
 
-    <!-- Live trip -->
+    <!-- Journey in progress -->
     <string name="trip_arrive">Arrive %1$s</string>
     <string name="trip_left">%1$d min to %2$s</string>
     <string name="trip_overview">Show whole route</string>
@@ -162,38 +117,25 @@
     <string name="trip_on_metro">%1$s to %2$s</string>
     <string name="trip_get_off_stops">Get off in %1$d min · %2$d stops</string>
     <string name="trip_auto_pickup">Auto pickup in %1$d min</string>
-    <string name="trip_drop_in">Drop in %1$d min</string>
-    <string name="trip_bus_late">Bus %1$s not coming?</string>
     <string name="trip_board_question">Has bus %1$s arrived?</string>
     <string name="trip_boarded">I\'m on it</string>
     <string name="trip_did_not_come">It didn\'t come</string>
-    <string name="trip_rescue_title">Bus %1$s didn\'t come</string>
-    <string name="trip_rerouted">Rerouted. Follow the new steps.</string>
+    <string name="trip_rerouted">Journey updated. Follow the new steps.</string>
     <string name="trip_pause">Pause</string>
     <string name="trip_resume">Resume</string>
     <string name="trip_skip">Skip to next step</string>
     <string name="trip_speed">Demo %1$d×</string>
-    <string name="trip_end">End trip</string>
-    <string name="trip_end_title">End this trip?</string>
-    <string name="trip_end_body">You\'ll go back to the map.</string>
+    <string name="trip_end">End journey</string>
+    <string name="trip_end_title">End this journey?</string>
+    <string name="trip_end_body">You\'ll go back to journey search.</string>
     <string name="trip_keep_going">Keep going</string>
 
-    <!-- Arrived -->
+    <!-- Arrival -->
     <string name="arrived_title">You\'ve arrived</string>
     <string name="arrived_at">%1$s · %2$s</string>
     <string name="arrived_time">Travel time</string>
     <string name="arrived_fare">Total fare</string>
     <string name="arrived_changes">Changes</string>
-    <string name="arrived_rerouted">Raasta rerouted you when your bus didn\'t come.</string>
-    <string name="arrived_rate">How was this route?</string>
-    <string name="arrived_star">%1$d stars</string>
-    <string name="arrived_thanks">Thanks! This helps rank routes for other riders.</string>
-    <string name="arrived_done">Done</string>
-
-    <!-- Bus didn't come -->
-    <string name="recover_where">Where are you waiting?</string>
-    <string name="recover_stop_subtitle">Bus %1$s · %2$s away</string>
-    <string name="recover_find">Find another way</string>
 
     <!-- Shortest vs safety route -->
     <string name="safety_shortest">Shortest</string>
@@ -227,4 +169,213 @@
     <string name="zone_source">Source: %1$s · %2$s</string>
     <string name="safety_sources_header">Street safety data</string>
     <string name="action_close">Close</string>
+
+    <!-- Journey input -->
+    <string name="home_title">Plan a journey</string>
+    <string name="home_to_hint">Choose a destination</string>
+    <string name="home_when">When</string>
+    <string name="depart_at_time">Depart %1$s</string>
+    <string name="home_continue">Continue</string>
+    <string name="home_choose_destination">Choose a destination to continue</string>
+    <string name="home_places">Destinations in this demo</string>
+    <string name="search_from_hint">Choose a starting point</string>
+    <string name="search_from_subtitle">Kharadi, Pune</string>
+
+    <!-- Travel preferences -->
+    <string name="prefs_title">Your travel preferences</string>
+    <string name="prefs_journey">%1$s → %2$s · %3$s</string>
+    <string name="prefs_last_time">Your preferences from last time. Change them or keep them.</string>
+    <string name="prefs_priorities">What matters most?</string>
+    <string name="prefs_priorities_hint">Pick one or more. With none picked, Raasta balances all of them.</string>
+    <string name="goal_time">Time</string>
+    <string name="goal_time_body">Arrive as early as possible.</string>
+    <string name="goal_cost">Cost</string>
+    <string name="goal_cost_body">Spend as little as possible.</string>
+    <string name="goal_convenience">Convenience</string>
+    <string name="goal_convenience_body">Less waiting, fewer changes and more reliable times.</string>
+    <string name="goal_accessibility">Accessibility</string>
+    <string name="goal_accessibility_body">Less walking and fewer changes. Step-free access at stations is not known yet.</string>
+    <string name="prefs_safety">Safety-aware routing</string>
+    <string name="prefs_safety_body">Prefer busier streets outside crime zones for walks and auto rides, even if a little longer. Crime zones in this demo are synthetic.</string>
+    <string name="prefs_walks">Avoid long walks</string>
+    <string name="prefs_walks_body">Rank routes with more walking lower.</string>
+    <string name="prefs_find_routes">Find routes</string>
+    <string name="prefs_summary">Priorities: %1$s</string>
+    <string name="prefs_balanced">balanced</string>
+    <string name="prefs_safety_short">Safety-aware</string>
+    <string name="prefs_walks_short">Avoid long walks</string>
+
+    <!-- Route analysis -->
+    <string name="check_title">Checking routes</string>
+    <string name="check_working">Checking…</string>
+    <string name="check_ranking">Ranking routes by your priorities…</string>
+    <string name="check_ranking_safety">Checking streets and ranking routes by your priorities…</string>
+    <plurals name="check_compare">
+        <item quantity="one">Compare %1$d route</item>
+        <item quantity="other">Compare %1$d routes</item>
+    </plurals>
+    <plurals name="check_found">
+        <item quantity="one">%1$d route can be taken at this time</item>
+        <item quantity="other">%1$d routes can be taken at this time</item>
+    </plurals>
+    <string name="check_status_ok">Checked</string>
+    <string name="check_status_estimate">Estimate</string>
+    <string name="check_status_unknown">Unknown</string>
+    <string name="check_status_outdated">May be outdated</string>
+    <string name="check_outdated">Last retrieved %1$d days ago. It may no longer be correct.</string>
+    <string name="check_source">%1$s · retrieved %2$s</string>
+    <string name="topic_metro_fares">Metro fares</string>
+    <string name="topic_bus_fares">Bus fares</string>
+    <string name="topic_auto_fares">Auto fares</string>
+    <string name="topic_bus_times">Bus times</string>
+    <string name="topic_metro_times">Metro times</string>
+    <string name="topic_walking">Walking and road routes</string>
+    <string name="topic_live">Live updates</string>
+    <string name="topic_reports">Rider reports</string>
+    <string name="topic_safety">Street safety</string>
+    <string name="topic_step_free">Step-free access</string>
+    <string name="topic_auto_availability">Auto availability</string>
+    <string name="detail_metro_fares">Station-to-station fares from the official chart.</string>
+    <string name="detail_bus_fares">Distance slabs as reported in the news; the official PMPML note was not verified.</string>
+    <string name="detail_auto_fares">Published meter rate, with the night surcharge where it applies.</string>
+    <string name="detail_bus_times">Waits come from timetabled departures.</string>
+    <string name="detail_bus_times_estimate">The timetable lists no trips after this time for some buses, so those waits assume the daytime frequency.</string>
+    <string name="detail_metro_times">Hours and gaps between trains are from a secondary source, not an official timetable.</string>
+    <string name="detail_walking">Routes on OpenStreetMap data.</string>
+    <string name="detail_live">No live bus or metro positions are available. During the journey Raasta will ask you when a bus is due.</string>
+    <string name="detail_reports_none">No verified rider reports for these routes.</string>
+    <string name="detail_reports">%1$d verified report(s) used · %2$d waiting for review and not used.</string>
+    <string name="detail_safety">Street activity from OpenStreetMap and official crime data.</string>
+    <string name="detail_safety_demo">Street activity is estimated from OpenStreetMap places and opening hours. Crime zones are synthetic demo data.</string>
+    <string name="detail_safety_unavailable">Street safety data could not be loaded, so routes are ranked without it.</string>
+    <string name="detail_step_free">Lifts and step-free access at stations are not known. Ranking uses walking distance and changes instead.</string>
+    <string name="detail_auto_availability">Whether an auto is available and how long pickup takes are not known.</string>
+
+    <!-- Route comparison -->
+    <string name="compare_title">Compare routes</string>
+    <string name="compare_change_prefs">Change</string>
+    <string name="compare_recommended">Recommended</string>
+    <string name="compare_alternatives">Other routes</string>
+    <string name="compare_vs_next">Compared with the next best route</string>
+    <string name="compare_vs_recommended">Compared with the recommended route</string>
+    <string name="compare_view_details">View journey details</string>
+    <string name="point_pro">Advantage</string>
+    <string name="point_con">Disadvantage</string>
+    <string name="point_faster">Arrives %1$d min sooner</string>
+    <string name="point_slower">Arrives %1$d min later</string>
+    <string name="point_cheaper">₹%1$d cheaper</string>
+    <string name="point_pricier">₹%1$d more</string>
+    <string name="point_less_wait">%1$d min less waiting</string>
+    <string name="point_more_wait">%1$d min more waiting</string>
+    <string name="point_less_walk">%1$s less walking</string>
+    <string name="point_more_walk">%1$s more walking</string>
+    <plurals name="point_fewer_changes">
+        <item quantity="one">%1$d fewer change</item>
+        <item quantity="other">%1$d fewer changes</item>
+    </plurals>
+    <plurals name="point_more_changes">
+        <item quantity="one">%1$d more change</item>
+        <item quantity="other">%1$d more changes</item>
+    </plurals>
+    <string name="point_safer">Safer streets: %1$d/100 vs %2$d/100</string>
+    <string name="point_less_safe">Less safe streets: %1$d/100 vs %2$d/100</string>
+    <string name="point_reliable">Times and fares are timetabled or official</string>
+    <string name="point_estimates">Mostly estimates, so times may differ</string>
+    <string name="point_long_wait">Long wait: %1$d min</string>
+    <string name="point_long_walk">Long walk: %1$s</string>
+    <string name="point_reported">Verified rider report: %1$s at %2$s</string>
+
+    <!-- Journey details -->
+    <string name="details_why_recommended">Why this route is recommended</string>
+    <string name="details_why_this">Advantages and disadvantages</string>
+    <string name="details_streets">Streets for walks and auto rides</string>
+    <string name="details_steps">Steps</string>
+    <string name="details_start">Start journey</string>
+
+    <!-- Journey monitoring and recovery -->
+    <string name="trip_auto_arrive_in">Arrive in %1$d min</string>
+    <string name="trip_board_why">Raasta has no live bus positions, so tell it whether the bus came at %1$s.</string>
+    <string name="trip_directions">Directions</string>
+    <string name="trip_report_problem">Report problem</string>
+    <string name="status_on_track">On track</string>
+    <string name="status_on_track_detail">Following the plan. Checked against the timetable and verified rider reports; no live data.</string>
+    <string name="status_check">Check needed</string>
+    <string name="status_bus_due">The bus is due. Has it come?</string>
+    <string name="status_at_risk">At risk</string>
+    <string name="status_last_metro">The last metro may leave before you reach it. Consider other options.</string>
+    <string name="status_reported">Riders have reported problems on %1$s.</string>
+    <string name="problem_title">What went wrong?</string>
+    <string name="problem_body">Raasta will look for other ways from where you are, using your preferences.</string>
+    <string name="problem_bus">My bus didn\'t come</string>
+    <string name="problem_missed">I missed a connection</string>
+    <string name="problem_unavailable">Transport is not running</string>
+    <string name="problem_late">I\'m running late</string>
+    <string name="recovery_title">%1$s: other options</string>
+    <string name="recovery_from">From %1$s at %2$s</string>
+    <string name="recovery_prefs_kept">Ranked by your preferences · %1$s</string>
+    <string name="recovery_none_now">No other way can be taken from here right now.</string>
+    <string name="recovery_keep">Keep my current plan</string>
+    <string name="recovery_none_title">No changes possible here</string>
+    <string name="recovery_none_on_board">You\'re on board. Report the problem again at the next stop to see other options from there.</string>
+    <string name="recovery_none_last_leg">This is the last part of your journey, so there is nothing to change.</string>
+    <string name="recovery_none_data">This demo has no data for other options from where you are.</string>
+    <string name="vs_original">Compared with your original plan: %1$s</string>
+    <string name="vs_original_later">%1$d min later</string>
+    <string name="vs_original_earlier">%1$d min earlier</string>
+    <string name="vs_original_same_time">same arrival time</string>
+    <string name="vs_original_more">₹%1$d more in total</string>
+    <string name="vs_original_less">₹%1$d less in total</string>
+    <string name="vs_original_same_fare">no extra cost</string>
+
+    <!-- Feedback -->
+    <plurals name="arrived_rerouted">
+        <item quantity="one">Raasta changed your plan once on the way.</item>
+        <item quantity="other">Raasta changed your plan %1$d times on the way.</item>
+    </plurals>
+    <string name="feedback_how">How did the journey go? (optional)</string>
+    <string name="rating_good">Good</string>
+    <string name="rating_okay">Okay</string>
+    <string name="rating_poor">Poor</string>
+    <string name="feedback_report">Report route conditions (optional)</string>
+    <string name="feedback_report_hint">Reports are checked before Raasta uses them to rank routes.</string>
+    <string name="feedback_where">Where: %1$s</string>
+    <string name="condition_bus_late">Bus late or didn\'t come</string>
+    <string name="condition_missed">Missed connection</string>
+    <string name="condition_crowded">Very crowded</string>
+    <string name="condition_lighting">Poor lighting</string>
+    <string name="condition_footpath">Footpath problem</string>
+    <string name="condition_unsafe">Felt unsafe</string>
+    <string name="feedback_send">Send feedback</string>
+    <string name="feedback_thanks">Thanks for the feedback</string>
+    <string name="feedback_saved">Your feedback is saved for review.</string>
+    <plurals name="feedback_pending">
+        <item quantity="one">Your report is waiting for review. It will not affect routes until it is verified.</item>
+        <item quantity="other">Your %1$d reports are waiting for review. They will not affect routes until they are verified.</item>
+    </plurals>
+    <string name="feedback_plan_another">Plan another journey</string>
+
+    <!-- Reports and review -->
+    <string name="reports_title">Your reports</string>
+    <string name="reports_intro">Route reports are checked before Raasta treats them as evidence. Only verified reports change how routes are ranked.</string>
+    <string name="reports_demo_reviewer">Demo: there is no review team yet, so you can verify or reject reports yourself.</string>
+    <plurals name="reports_feedback_count">
+        <item quantity="one">%1$d journey rated</item>
+        <item quantity="other">%1$d journeys rated</item>
+    </plurals>
+    <plurals name="reports_verified_count">
+        <item quantity="one">%1$d verified report in use</item>
+        <item quantity="other">%1$d verified reports in use</item>
+    </plurals>
+    <string name="reports_empty">No reports yet. You can report route conditions at the end of a journey.</string>
+    <string name="report_unverified">Waiting for review</string>
+    <string name="report_verified">Verified</string>
+    <string name="report_rejected">Rejected</string>
+    <plurals name="report_matches">
+        <item quantity="one">%1$d other report matches this one</item>
+        <item quantity="other">%1$d other reports match this one</item>
+    </plurals>
+    <string name="report_verify">Verify</string>
+    <string name="report_reject">Reject</string>
+    <string name="report_verified_body">Used when ranking routes that pass this place.</string>
+    <string name="report_rejected_body">Not used.</string>
 </resources>

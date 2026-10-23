@@ -17,22 +17,31 @@ import androidx.navigation.compose.rememberNavController
 import com.raasta.app.auth.DemoSessionStore
 import com.raasta.app.auth.SessionState
 import com.raasta.app.ui.TripViewModel
+import com.raasta.app.ui.feedback.FeedbackScreen
+import com.raasta.app.ui.feedback.ReportsScreen
 import com.raasta.app.ui.home.HomeScreen
 import com.raasta.app.ui.login.LoginScreen
-import com.raasta.app.ui.plan.ArrivedScreen
-import com.raasta.app.ui.plan.RecoverScreen
-import com.raasta.app.ui.plan.RouteOptionsScreen
-import com.raasta.app.ui.plan.TripScreen
+import com.raasta.app.ui.plan.CompareRoutesScreen
+import com.raasta.app.ui.plan.JourneyDetailsScreen
+import com.raasta.app.ui.plan.JourneyScreen
+import com.raasta.app.ui.plan.RouteCheckScreen
+import com.raasta.app.ui.prefs.PreferencesScreen
 import com.raasta.app.ui.search.SearchScreen
 import kotlinx.coroutines.launch
 
+/** Journey input -> preferences -> route analysis -> comparison -> details -> journey -> feedback. */
 private object Routes {
     const val HOME = "home"
-    const val SEARCH = "search"
-    const val OPTIONS = "options"
-    const val TRIP = "trip"
-    const val ARRIVED = "arrived"
-    const val RECOVER = "recover"
+    const val SEARCH = "search/{field}"
+    const val PREFERENCES = "preferences"
+    const val CHECK = "check"
+    const val COMPARE = "compare"
+    const val DETAILS = "details"
+    const val JOURNEY = "journey"
+    const val FEEDBACK = "feedback"
+    const val REPORTS = "reports"
+
+    fun search(editFrom: Boolean) = "search/${if (editFrom) "from" else "to"}"
 }
 
 @Composable
@@ -62,54 +71,69 @@ private fun SignedInNavHost(phone: String, onSignOut: () -> Unit) {
             HomeScreen(
                 vm = vm,
                 phone = phone,
-                onSearch = {
-                    vm.startPlanning()
-                    navController.navigate(Routes.SEARCH)
-                },
-                onDestination = { id ->
-                    vm.startPlanning()
-                    vm.chooseDestination(id)
-                    navController.navigate(Routes.OPTIONS)
-                },
-                onBusDidNotCome = { navController.navigate(Routes.RECOVER) },
+                onEditFrom = { navController.navigate(Routes.search(editFrom = true)) },
+                onEditTo = { navController.navigate(Routes.search(editFrom = false)) },
+                onContinue = { navController.navigate(Routes.PREFERENCES) },
+                onReports = { navController.navigate(Routes.REPORTS) },
                 onSignOut = onSignOut,
             )
         }
-        composable(Routes.SEARCH) {
+        composable(Routes.SEARCH) { entry ->
             SearchScreen(
                 vm = vm,
+                editFrom = entry.arguments?.getString("field") == "from",
                 onBack = { navController.popBackStack() },
-                onDone = {
-                    navController.navigate(Routes.OPTIONS) { popUpTo(Routes.HOME) }
-                },
+                onDone = { navController.popBackStack() },
             )
         }
-        composable(Routes.RECOVER) {
-            RecoverScreen(
+        composable(Routes.PREFERENCES) {
+            PreferencesScreen(
                 vm = vm,
                 onBack = { navController.popBackStack() },
-                onFindOptions = { navController.navigate(Routes.OPTIONS) },
+                onFindRoutes = { navController.navigate(Routes.CHECK) },
             )
         }
-        composable(Routes.OPTIONS) {
-            RouteOptionsScreen(
+        composable(Routes.CHECK) {
+            RouteCheckScreen(
+                vm = vm,
+                onBack = { navController.popBackStack() },
+                onCompare = { navController.navigate(Routes.COMPARE) { popUpTo(Routes.PREFERENCES) } },
+            )
+        }
+        composable(Routes.COMPARE) {
+            CompareRoutesScreen(
+                vm = vm,
+                onBack = { navController.popBackStack() },
+                onEditPreferences = { navController.popBackStack(Routes.PREFERENCES, inclusive = false) },
+                onDetails = { navController.navigate(Routes.DETAILS) },
+            )
+        }
+        composable(Routes.DETAILS) {
+            JourneyDetailsScreen(
                 vm = vm,
                 onBack = { navController.popBackStack() },
                 onStart = { journey ->
                     vm.startTrip(journey)
-                    navController.navigate(Routes.TRIP) { popUpTo(Routes.HOME) }
+                    navController.navigate(Routes.JOURNEY) { popUpTo(Routes.HOME) }
                 },
             )
         }
-        composable(Routes.TRIP) {
-            TripScreen(
+        composable(Routes.JOURNEY) {
+            JourneyScreen(
                 vm = vm,
-                onArrived = { navController.navigate(Routes.ARRIVED) { popUpTo(Routes.HOME) } },
+                onArrived = { navController.navigate(Routes.FEEDBACK) { popUpTo(Routes.HOME) } },
                 onEnded = { navController.backToHome() },
             )
         }
-        composable(Routes.ARRIVED) {
-            ArrivedScreen(vm = vm, onDone = { navController.backToHome() })
+        composable(Routes.FEEDBACK) {
+            FeedbackScreen(
+                vm = vm,
+                onPlanAnother = { navController.backToHome() },
+                onReports = { navController.navigate(Routes.REPORTS) },
+            )
+        }
+        composable(Routes.REPORTS) {
+            ReportsScreen(vm = vm, onBack = { navController.popBackStack() })
         }
     }
 }

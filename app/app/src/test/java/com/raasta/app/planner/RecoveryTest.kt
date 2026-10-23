@@ -42,7 +42,7 @@ class RecoveryTest {
 
     @Test
     fun lateEveningRecommendsSwitchingAndSaysWhatItCosts() {
-        val result = planner.recover("kharadi_gaon", "vanaj", nowMin = 21 * 60 + 50, failedRoute = "235", priority = Priority.BALANCED)
+        val result = planner.recover("kharadi_gaon", "vanaj", nowMin = 21 * 60 + 50, failedRoute = "235", preferences = TravelPreferences(goals = emptySet()))
         val best = result.ranked.first().journey
         assertEquals(JourneyKind.AUTO_METRO, best.kind)
         val versus = assertNotNullAndGet(result.versusWaiting())
@@ -53,7 +53,7 @@ class RecoveryTest {
 
     @Test
     fun noComparisonWhenWaitingIsTheBestOption() {
-        val result = planner.recover("kharadi_gaon", "vanaj", nowMin = 9 * 60 + 21, failedRoute = "235", priority = Priority.CHEAPEST)
+        val result = planner.recover("kharadi_gaon", "vanaj", nowMin = 9 * 60 + 21, failedRoute = "235", preferences = TravelPreferences(goals = setOf(Goal.COST)))
         assertTrue(result.ranked.first().journey.retriesFailedRoute)
         assertEquals(null, result.versusWaiting())
     }

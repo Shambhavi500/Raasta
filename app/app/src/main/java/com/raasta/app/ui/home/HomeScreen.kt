@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,16 +18,15 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -47,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.raasta.app.R
 import com.raasta.app.auth.DemoAuth
@@ -64,42 +65,46 @@ import com.raasta.app.ui.common.TimePill
 import com.raasta.app.ui.plan.LeaveTimeDialog
 import com.raasta.app.ui.plan.SourcesList
 import com.raasta.app.ui.plan.clock
-import com.raasta.app.ui.theme.AttentionAmber
 import com.raasta.app.ui.theme.ElectricLime
 import com.raasta.app.ui.theme.MetroAqua
 import com.raasta.app.ui.theme.Obsidian
 
-/** Map-first home: where you are, "Where to?", saved places and the missed-bus shortcut. */
+/** Home: a map and the journey search — from, to and when. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     vm: TripViewModel,
     phone: String,
-    onSearch: () -> Unit,
-    onDestination: (String) -> Unit,
-    onBusDidNotCome: () -> Unit,
+    onEditFrom: () -> Unit,
+    onEditTo: () -> Unit,
+    onContinue: () -> Unit,
+    onReports: () -> Unit,
     onSignOut: () -> Unit,
 ) {
     val corridor = vm.corridor
     val origin = corridor.origin(vm.originId)
-    val you = LatLon(origin.lat, origin.lon)
+    val from = LatLon(origin.lat, origin.lon)
+    val destination = vm.destinationId?.let { corridor.destination(it) }
     var recenter by remember { mutableIntStateOf(0) }
     var showAccount by rememberSaveable { mutableStateOf(false) }
     var showTime by rememberSaveable { mutableStateOf(false) }
 
-    val pins = remember(you) {
+    val pins = remember(from, destination) {
         buildList {
             corridor.recoveryPoints.forEach { add(MapPin("stop-${it.id}", LatLon(it.lat, it.lon), PinStyle.STOP)) }
             corridor.metro.stations.forEach { add(MapPin("st-${it.name}", LatLon(it.lat, it.lon), PinStyle.STATION, color = MetroAqua)) }
-            add(MapPin("you", you, PinStyle.YOU))
+            add(MapPin("from", from, PinStyle.YOU))
+            destination?.let { add(MapPin("to", LatLon(it.lat, it.lon), PinStyle.DROP, label = it.name.substringBefore(","))) }
         }
     }
+    val camera = destination?.let { MapCamera.Fit(listOf(from, LatLon(it.lat, it.lon)), recenter) }
+        ?: MapCamera.Center(from, 15.0, recenter)
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
         RaastaMap(
             pins = pins,
             lines = emptyList(),
-            camera = MapCamera.Center(you, 15.0, recenter),
+            camera = camera,
             modifier = Modifier.fillMaxSize(),
             centerOffsetY = -maxHeight * 0.24f,
         )
@@ -142,30 +147,56 @@ fun HomeScreen(
                         .padding(bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    Text(
-                        stringResource(R.string.home_you_are_at, origin.name),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    Text(stringResource(R.string.home_title), style = MaterialTheme.typography.titleLarge)
+                    JourneyFields(
+                        from = origin.name,
+                        to = destination?.name,
+                        onFrom = onEditFrom,
+                        onTo = onEditTo,
                     )
-                    WhereToBar(
-                        timeText = vm.departAt?.let { stringResource(R.string.leave_at_time, clock(it)) }
-                            ?: stringResource(R.string.leave_now_short),
-                        onSearch = onSearch,
-                        onTime = { showTime = true },
-                    )
-                    corridor.destinations.forEach { destination ->
-                        PlaceRow(
-                            title = destination.name,
-                            subtitle = stringResource(
-                                R.string.home_place_subtitle,
-                                destination.metroStation,
-                                distanceLabel(distanceM(you, LatLon(destination.lat, destination.lon))),
-                            ),
-                            onClick = { onDestination(destination.id) },
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            stringResource(R.string.home_when),
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.weight(1f),
+                        )
+                        TimePill(
+                            vm.departAt?.let { stringResource(R.string.depart_at_time, clock(it)) }
+                                ?: stringResource(R.string.leave_now_short),
+                            onClick = { showTime = true },
+                        )
+                    }
+                    Button(
+                        onClick = onContinue,
+                        enabled = destination != null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = ElectricLime, contentColor = Obsidian),
+                    ) {
+                        Text(
+                            stringResource(if (destination != null) R.string.home_continue else R.string.home_choose_destination),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                    BusDidNotComeCard(onClick = onBusDidNotCome)
+                    Text(
+                        stringResource(R.string.home_places),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    corridor.destinations.forEach { place ->
+                        PlaceRow(
+                            title = place.name,
+                            subtitle = stringResource(
+                                R.string.home_place_subtitle,
+                                place.metroStation,
+                                distanceLabel(distanceM(from, LatLon(place.lat, place.lon))),
+                            ),
+                            onClick = { vm.chooseDestination(place.id) },
+                        )
+                    }
                 }
             }
         }
@@ -202,6 +233,11 @@ fun HomeScreen(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                OutlinedButton(onClick = { showAccount = false; onReports() }, modifier = Modifier.fillMaxWidth()) {
+                    Icon(Icons.Filled.Flag, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.reports_title))
+                }
                 OutlinedButton(onClick = { showAccount = false; onSignOut() }, modifier = Modifier.fillMaxWidth()) {
                     Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
@@ -215,26 +251,50 @@ fun HomeScreen(
     }
 }
 
+/** The starting point and destination, each tappable to change it. */
 @Composable
-private fun WhereToBar(timeText: String, onSearch: () -> Unit, onTime: () -> Unit) {
+private fun JourneyFields(from: String, to: String?, onFrom: () -> Unit, onTo: () -> Unit) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.small)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+    ) {
+        FieldRow(stringResource(R.string.plan_from), from, filled = true, onClick = onFrom, start = true)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, modifier = Modifier.padding(start = 44.dp))
+        FieldRow(stringResource(R.string.plan_to), to ?: stringResource(R.string.home_to_hint), filled = to != null, onClick = onTo, start = false)
+    }
+}
+
+@Composable
+private fun FieldRow(label: String, value: String, filled: Boolean, onClick: () -> Unit, start: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-            .clickable(onClick = onSearch)
-            .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(Icons.Filled.Search, contentDescription = null, modifier = Modifier.size(26.dp))
-        Text(
-            stringResource(R.string.home_where_to),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+        Box(
+            Modifier
+                .size(12.dp)
+                .clip(if (start) CircleShape else MaterialTheme.shapes.extraSmall)
+                .background(if (start) MaterialTheme.colorScheme.onSurface else ElectricLime),
         )
-        TimePill(timeText, onClick = onTime)
+        Column(
+            Modifier
+                .weight(1f)
+                .padding(start = 16.dp),
+        ) {
+            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                value,
+                style = MaterialTheme.typography.titleMedium,
+                color = if (filled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
 
@@ -265,41 +325,5 @@ internal fun PlaceRow(title: String, subtitle: String, onClick: () -> Unit) {
             Text(title, style = MaterialTheme.typography.titleMedium)
             Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-    }
-}
-
-@Composable
-private fun BusDidNotComeCard(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.small)
-            .background(AttentionAmber.copy(alpha = 0.12f))
-            .clickable(onClick = onClick)
-            .padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(AttentionAmber),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(Icons.Filled.WarningAmber, contentDescription = null, tint = Obsidian)
-        }
-        Column(
-            Modifier
-                .weight(1f)
-                .padding(horizontal = 14.dp),
-        ) {
-            Text(stringResource(R.string.home_recover_title), style = MaterialTheme.typography.titleMedium)
-            Text(
-                stringResource(R.string.home_recover_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
     }
 }

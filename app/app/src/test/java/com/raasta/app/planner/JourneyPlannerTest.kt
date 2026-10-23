@@ -65,14 +65,14 @@ class JourneyPlannerTest {
 
     @Test
     fun balancedRankingPrefersBusAndMetroOverLongAutoRide() {
-        val result = planner.plan("wtc", "vanaj", departMin = 9 * 60, priority = Priority.BALANCED)
+        val result = planner.plan("wtc", "vanaj", departMin = 9 * 60, preferences = TravelPreferences(goals = emptySet()))
         assertEquals(JourneyKind.BUS_METRO, result.ranked.first().journey.kind)
         assertFalse(result.ranked.first().journey.kind == JourneyKind.AUTO_DIRECT)
     }
 
     @Test
     fun cheapestHighlightGoesToLowestFare() {
-        val result = planner.plan("wtc", "vanaj", departMin = 9 * 60, priority = Priority.CHEAPEST)
+        val result = planner.plan("wtc", "vanaj", departMin = 9 * 60, preferences = TravelPreferences(goals = setOf(Goal.COST)))
         val cheapest = result.ranked.filter { Highlight.CHEAPEST in it.highlights }
         assertTrue(cheapest.isNotEmpty())
         assertEquals(result.ranked.minOf { it.journey.fare }, cheapest.first().journey.fare)
