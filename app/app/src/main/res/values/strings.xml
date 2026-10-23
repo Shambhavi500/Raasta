@@ -22,8 +22,8 @@
     <string name="home_question">What do you need right now?</string>
     <string name="home_plan_title">Plan my trip</string>
     <string name="home_plan_subtitle">Compare bus, metro and auto options</string>
-    <string name="home_recover_title">My connection failed</string>
-    <string name="home_recover_subtitle">Find another way from where you are</string>
+    <string name="home_recover_title">Bus didn\'t show up?</string>
+    <string name="home_recover_subtitle">Find another way from your stop</string>
 
     <!-- Trip planning -->
     <string name="plan_corridor_note">Demo corridor: %1$s. Data built on %2$s.</string>
@@ -117,4 +117,81 @@
     <string name="recover_best_generic">%1$s ranks first. Waiting for bus %2$s would not get you there before the metro stops.</string>
     <string name="journey_keep_waiting">Keep waiting for bus %1$s</string>
     <string name="caution_failed_route">Bus %1$s just did not come; the next one may also be late or missing.</string>
+
+    <!-- Map home -->
+    <string name="home_account">Account</string>
+    <string name="home_where_to">Where to?</string>
+    <string name="home_you_are_at">Pickup: %1$s</string>
+    <string name="home_place_subtitle">Near %1$s Metro · %2$s</string>
+    <string name="map_recenter">Re-center map</string>
+    <string name="leave_now_short">Now</string>
+    <string name="leave_at_time">%1$s</string>
+    <string name="time_dialog_title">When do you want to leave?</string>
+    <string name="time_dialog_set">Set time</string>
+    <string name="time_dialog_now">Leave now</string>
+
+    <!-- Search -->
+    <string name="search_title">Plan your trip</string>
+    <string name="search_pickup_subtitle">Kharadi, Pune</string>
+    <string name="search_pickup_hint">Choose a pickup point</string>
+    <string name="search_no_match">No matches. This demo covers %1$s.</string>
+    <string name="search_clear">Clear</string>
+
+    <!-- Route options -->
+    <string name="options_title">Choose a route</string>
+    <string name="options_title_recover">Another way from here</string>
+    <string name="options_route">%1$s → %2$s</string>
+    <string name="option_arrive">Arrive %1$s · %2$d min waiting</string>
+    <string name="options_details">Details</string>
+    <string name="options_start">Start trip · %1$s</string>
+    <string name="options_metro_closed">%1$d bus and metro route(s) not running now</string>
+    <string name="options_metro_hours">Aqua Line runs about %1$s–%2$s.</string>
+    <string name="options_change_time">Change time</string>
+
+    <!-- Live trip -->
+    <string name="trip_arrive">Arrive %1$s</string>
+    <string name="trip_left">%1$d min to %2$s</string>
+    <string name="trip_overview">Show whole route</string>
+    <string name="trip_bus_arrives">Bus %1$s in %2$d min</string>
+    <string name="trip_bus_due">Bus %1$s is due now</string>
+    <string name="trip_wait_at">Wait at %1$s</string>
+    <string name="trip_on_bus">On bus %1$s to %2$s</string>
+    <string name="trip_get_off_in">Get off in %1$d min</string>
+    <string name="trip_train_arrives">%1$s train in %2$d min</string>
+    <string name="trip_platform">%1$s platform</string>
+    <string name="trip_on_metro">%1$s to %2$s</string>
+    <string name="trip_get_off_stops">Get off in %1$d min · %2$d stops</string>
+    <string name="trip_auto_pickup">Auto pickup in %1$d min</string>
+    <string name="trip_drop_in">Drop in %1$d min</string>
+    <string name="trip_bus_late">Bus %1$s not coming?</string>
+    <string name="trip_board_question">Has bus %1$s arrived?</string>
+    <string name="trip_boarded">I\'m on it</string>
+    <string name="trip_did_not_come">It didn\'t come</string>
+    <string name="trip_rescue_title">Bus %1$s didn\'t come</string>
+    <string name="trip_rerouted">Rerouted. Follow the new steps.</string>
+    <string name="trip_pause">Pause</string>
+    <string name="trip_resume">Resume</string>
+    <string name="trip_skip">Skip to next step</string>
+    <string name="trip_speed">Demo %1$d×</string>
+    <string name="trip_end">End trip</string>
+    <string name="trip_end_title">End this trip?</string>
+    <string name="trip_end_body">You\'ll go back to the map.</string>
+    <string name="trip_keep_going">Keep going</string>
+
+    <!-- Arrived -->
+    <string name="arrived_title">You\'ve arrived</string>
+    <string name="arrived_at">%1$s · %2$s</string>
+    <string name="arrived_time">Travel time</string>
+    <string name="arrived_fare">Total fare</string>
+    <string name="arrived_changes">Changes</string>
+    <string name="arrived_rerouted">Raasta rerouted you when your bus didn\'t come.</string>
+    <string name="arrived_rate">How was this route?</string>
+    <string name="arrived_star">%1$d stars</string>
+    <string name="arrived_thanks">Thanks! This helps rank routes for other riders.</string>
+    <string name="arrived_done">Done</string>
+
+    <!-- Bus didn't come -->
+    <string name="recover_where">Where are you waiting?</string>
+    <string name="recover_stop_subtitle">Bus %1$s · %2$s away</string>
+    <string name="recover_find">Find another way</string>
 </resources>

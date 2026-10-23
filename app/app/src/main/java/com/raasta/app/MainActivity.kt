@@ -7,6 +7,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.raasta.app.auth.DemoSessionStore
+import com.raasta.app.map.configureMaps
 import com.raasta.app.ui.theme.RaastaTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,6 +18,7 @@ class MainActivity : ComponentActivity() {
             statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
         )
+        configureMaps(applicationContext)
         val sessionStore = DemoSessionStore(applicationContext)
         setContent {
             RaastaTheme {
