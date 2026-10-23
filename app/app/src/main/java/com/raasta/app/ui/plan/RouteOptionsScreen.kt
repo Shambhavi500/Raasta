@@ -51,16 +51,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.raasta.app.R
 import com.raasta.app.map.MapCamera
+import com.raasta.app.map.MapLine
 import com.raasta.app.map.RaastaMap
 import com.raasta.app.planner.Journey
 import com.raasta.app.planner.Priority
+import com.raasta.app.planner.Mode
 import com.raasta.app.planner.parseClock
+import com.raasta.app.safety.RouteVariant
+import com.raasta.app.safety.hourOf
+import com.raasta.app.ui.SafetyStatus
 import com.raasta.app.ui.TripViewModel
 import com.raasta.app.ui.common.MapButton
 import com.raasta.app.ui.common.MapSheet
 import com.raasta.app.ui.common.TimePill
 import com.raasta.app.ui.theme.AttentionAmber
 import com.raasta.app.ui.theme.ElectricLime
+import com.raasta.app.ui.theme.MutedSlate
 import com.raasta.app.ui.theme.Obsidian
 
 /** Route choice over a map, like choosing a ride: options, price, time, then confirm. */
@@ -75,8 +81,22 @@ fun RouteOptionsScreen(vm: TripViewModel, onBack: () -> Unit, onStart: (Journey)
     val selected = ranked.getOrNull(vm.selectedIndex)?.journey ?: ranked.firstOrNull()?.journey
     var showDetails by rememberSaveable { mutableStateOf(false) }
     var showTime by rememberSaveable { mutableStateOf(false) }
+    var tappedZone by rememberSaveable { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(ranked) { ranked.forEach { vm.loadShapes(it.journey) } }
+    LaunchedEffect(ranked, vm.safetyStatus) {
+        ranked.forEach {
+            vm.loadShapes(it.journey)
+            vm.compareRoutes(it.journey)
+        }
+    }
+    // The chosen option with shortest or safety streets, and the other one to draw in grey.
+    val routes = selected?.let { vm.comparisons[it] }
+    val shown = routes?.journey(vm.routeVariant) ?: selected
+    val other = routes?.takeIf { !it.same }?.journey(
+        if (vm.routeVariant == RouteVariant.SAFEST) RouteVariant.SHORTEST else RouteVariant.SAFEST,
+    )
+    val hour = hourOf(shown?.departMin ?: vm.startMinute)
+    val crime = (vm.safetyStatus as? SafetyStatus.Ready)?.crime
 
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val sheetHeight = maxHeight * 0.58f
@@ -85,15 +105,28 @@ fun RouteOptionsScreen(vm: TripViewModel, onBack: () -> Unit, onStart: (Journey)
                 .fillMaxWidth()
                 .height(maxHeight - sheetHeight + 28.dp),
         ) {
-            if (selected != null) {
+            if (selected != null && shown != null) {
+                val otherLines = other?.legs.orEmpty()
+                    .filter { it.mode == Mode.WALK || it.mode == Mode.AUTO }
+                    .map { MapLine(vm.shapeOf(it), MutedSlate) }
                 RaastaMap(
-                    pins = journeyPins(vm, selected, pickupLabel = vm.fromName.substringBefore(","), dropLabel = destinationName.substringBefore(",")),
-                    lines = journeyLines(vm, selected),
-                    camera = MapCamera.Fit(journeyPoints(vm, selected)),
+                    pins = journeyPins(vm, shown, pickupLabel = vm.fromName.substringBefore(","), dropLabel = destinationName.substringBefore(",")),
+                    lines = otherLines + journeyLines(vm, shown),
+                    // Fit both versions so switching between them does not move the map.
+                    camera = MapCamera.Fit(journeyPoints(vm, selected) + routes?.safest?.let { journeyPoints(vm, it) }.orEmpty()),
                     modifier = Modifier.fillMaxSize(),
+                    heat = heatSpots(vm, hour),
+                    onHeatSpotClick = { tappedZone = it },
                 )
             } else {
-                RaastaMap(pins = emptyList(), lines = emptyList(), camera = MapCamera.Fit(listOf(vm.fromPoint)), modifier = Modifier.fillMaxSize())
+                RaastaMap(
+                    pins = emptyList(),
+                    lines = emptyList(),
+                    camera = MapCamera.Fit(listOf(vm.fromPoint)),
+                    modifier = Modifier.fillMaxSize(),
+                    heat = heatSpots(vm, hour),
+                    onHeatSpotClick = { tappedZone = it },
+                )
             }
             MapButton(
                 Icons.AutoMirrored.Filled.ArrowBack,
@@ -103,6 +136,25 @@ fun RouteOptionsScreen(vm: TripViewModel, onBack: () -> Unit, onStart: (Journey)
                     .statusBarsPadding()
                     .padding(16.dp),
             )
+            HeatLegend(
+                vm,
+                hour,
+                Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 16.dp, bottom = 40.dp),
+            )
+            val zone = tappedZone?.let { crime?.zone(it) }
+            if (zone != null && crime != null && vm.showCrimeHeat) {
+                CrimeZoneCard(
+                    zone,
+                    crime,
+                    onClose = { tappedZone = null },
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .statusBarsPadding()
+                        .padding(top = 72.dp, start = 16.dp, end = 16.dp),
+                )
+            }
         }
 
         MapSheet(
@@ -161,11 +213,15 @@ fun RouteOptionsScreen(vm: TripViewModel, onBack: () -> Unit, onStart: (Journey)
                             item { RecommendationBanner(result, rescue.failedRoute, Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) }
                         }
                     }
+                    if (selected != null) {
+                        item { SafetyRoutePicker(vm, selected, Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) }
+                    }
                     itemsIndexed(ranked) { index, option ->
                         OptionRow(
                             ranked = option,
                             selected = option.journey == selected,
                             onClick = { vm.selectedIndex = index },
+                            safetyScore = vm.comparisons[option.journey]?.safestExposure?.score,
                         )
                     }
                     if (notRunningCount > 0) {
@@ -185,22 +241,22 @@ fun RouteOptionsScreen(vm: TripViewModel, onBack: () -> Unit, onStart: (Journey)
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    TextButton(onClick = { showDetails = true }, enabled = selected != null) {
+                    TextButton(onClick = { showDetails = true }, enabled = shown != null) {
                         Icon(Icons.Filled.Info, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(6.dp))
                         Text(stringResource(R.string.options_details))
                     }
                     Spacer(Modifier.width(8.dp))
                     Button(
-                        onClick = { selected?.let(onStart) },
-                        enabled = selected != null,
+                        onClick = { shown?.let(onStart) },
+                        enabled = shown != null,
                         modifier = Modifier
                             .weight(1f)
                             .height(56.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = ElectricLime, contentColor = Obsidian),
                     ) {
                         Text(
-                            selected?.let { stringResource(R.string.options_start, stringResource(R.string.journey_fare, it.fare)) }
+                            shown?.let { stringResource(R.string.options_start, stringResource(R.string.journey_fare, it.fare)) }
                                 ?: stringResource(R.string.plan_no_results),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
@@ -211,7 +267,7 @@ fun RouteOptionsScreen(vm: TripViewModel, onBack: () -> Unit, onStart: (Journey)
         }
     }
 
-    if (showDetails && selected != null) {
+    if (showDetails && shown != null) {
         ModalBottomSheet(
             onDismissRequest = { showDetails = false },
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -225,19 +281,24 @@ fun RouteOptionsScreen(vm: TripViewModel, onBack: () -> Unit, onStart: (Journey)
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Text(
-                    journeyTitle(selected.kind, selected.busRoute, selected.retriesFailedRoute),
+                    journeyTitle(shown.kind, shown.busRoute, shown.retriesFailedRoute),
                     style = MaterialTheme.typography.headlineSmall,
                 )
                 Text(
-                    stringResource(R.string.journey_arrive, clock(selected.departMin), clock(selected.arriveMin)) +
-                        " · " + stringResource(R.string.journey_minutes, selected.totalMin),
+                    stringResource(R.string.journey_arrive, clock(shown.departMin), clock(shown.arriveMin)) +
+                        " · " + stringResource(R.string.journey_minutes, shown.totalMin),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                JourneySteps(selected)
+                JourneySteps(shown)
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 Text(stringResource(R.string.sources_header), style = MaterialTheme.typography.titleMedium)
                 SourcesList(vm.corridor)
+                (vm.safetyStatus as? SafetyStatus.Ready)?.let { ready ->
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Text(stringResource(R.string.safety_sources_header), style = MaterialTheme.typography.titleMedium)
+                    SourcesList(ready.model.graph.meta.sources + listOfNotNull(ready.crime?.data?.source))
+                }
             }
         }
     }

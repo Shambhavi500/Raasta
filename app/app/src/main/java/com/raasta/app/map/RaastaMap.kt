@@ -8,6 +8,11 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.DashPathEffect
 import android.graphics.Paint
+import android.graphics.Point
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.graphics.RadialGradient
+import android.graphics.Shader
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
@@ -38,6 +43,7 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Overlay
 import org.osmdroid.views.overlay.Polyline
 import java.io.File
 
@@ -52,6 +58,16 @@ data class MapPin(
 )
 
 data class MapLine(val points: List<LatLon>, val color: Color, val dashed: Boolean = false)
+
+/** A soft circle on the heatmap layer, [radiusM] across on the ground. Spots with an [id] can be tapped. */
+data class HeatSpot(
+    val at: LatLon,
+    val radiusM: Double,
+    val color: Color,
+    /** 0..1, how strongly the spot is drawn. */
+    val strength: Float,
+    val id: String? = null,
+)
 
 /** What the camera should do. A new value is applied once; panning by hand is kept until then. */
 sealed interface MapCamera {
@@ -112,12 +128,16 @@ fun RaastaMap(
     centerOffsetY: Dp = 0.dp,
     onMapTouched: () -> Unit = {},
     onPinClick: (String) -> Unit = {},
+    /** Drawn under the lines and pins. */
+    heat: List<HeatSpot> = emptyList(),
+    onHeatSpotClick: (String) -> Unit = {},
 ) {
     val context = LocalContext.current
     val offsetPx = with(LocalDensity.current) { centerOffsetY.roundToPx() }
     val holder = remember { MapHolder(context) }
     val touched by rememberUpdatedState(onMapTouched)
     val pinClick by rememberUpdatedState(onPinClick)
+    val heatClick by rememberUpdatedState(onHeatSpotClick)
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
@@ -147,7 +167,9 @@ fun RaastaMap(
         },
         update = {
             holder.onPinClick = { id -> pinClick(id) }
+            holder.heat.onSpotClick = { id -> heatClick(id) }
             holder.setCenterOffset(offsetPx)
+            holder.setHeat(heat)
             holder.setLines(lines)
             holder.setPins(pins)
             holder.setCamera(camera)
@@ -177,6 +199,12 @@ private class MapHolder(private val context: Context) {
         controller.setCenter(GeoPoint(18.535, 73.88))
     }
     var onPinClick: (String) -> Unit = {}
+    val heat = HeatOverlay()
+
+    init {
+        // First in the list, so it draws over the tiles and under everything else.
+        map.overlays.add(0, heat)
+    }
 
     private val density = context.resources.displayMetrics.density
     private var shownLines: List<MapLine> = emptyList()
@@ -216,6 +244,12 @@ private class MapHolder(private val context: Context) {
         if (dashed) outlinePaint.pathEffect = DashPathEffect(floatArrayOf(2f * density, 7f * density), 0f)
         infoWindow = null
         setOnClickListener { _, _, _ -> false }
+    }
+
+    fun setHeat(spots: List<HeatSpot>) {
+        if (spots == heat.spots) return
+        heat.spots = spots
+        map.invalidate()
     }
 
     fun setPins(pins: List<MapPin>) {
@@ -288,6 +322,65 @@ private class MapHolder(private val context: Context) {
     private fun whenLaidOut(action: () -> Unit) {
         if (map.width > 0 && map.height > 0) action()
         else map.addOnFirstLayoutListener { _, _, _, _, _ -> action() }
+    }
+}
+
+/** Heatmap spots drawn as one blurred circle bitmap, tinted and scaled per spot. */
+private class HeatOverlay : Overlay() {
+    var spots: List<HeatSpot> = emptyList()
+    var onSpotClick: (String) -> Unit = {}
+
+    private val blob: Bitmap = Bitmap.createBitmap(BLOB_PX, BLOB_PX, Bitmap.Config.ARGB_8888).apply {
+        val r = BLOB_PX / 2f
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            shader = RadialGradient(
+                r, r, r,
+                intArrayOf(0xFFFFFFFF.toInt(), 0x99FFFFFF.toInt(), 0x00FFFFFF),
+                floatArrayOf(0f, 0.55f, 1f),
+                Shader.TileMode.CLAMP,
+            )
+        }
+        Canvas(this).drawCircle(r, r, r, paint)
+    }
+    private val paint = Paint(Paint.FILTER_BITMAP_FLAG or Paint.ANTI_ALIAS_FLAG)
+    private val tints = mutableMapOf<Int, PorterDuffColorFilter>()
+    private val point = Point()
+    private val rect = RectF()
+
+    override fun draw(canvas: Canvas, mapView: MapView, shadow: Boolean) {
+        if (shadow || spots.isEmpty()) return
+        val projection = mapView.projection
+        val screen = RectF(projection.screenRect)
+        spots.forEach { spot ->
+            projection.toPixels(GeoPoint(spot.at.lat, spot.at.lon), point)
+            val r = projection.metersToPixels(spot.radiusM.toFloat(), spot.at.lat, projection.zoomLevel)
+            if (r < 2f) return@forEach
+            rect.set(point.x - r, point.y - r, point.x + r, point.y + r)
+            if (!RectF.intersects(rect, screen)) return@forEach
+            val argb = spot.color.toArgb()
+            paint.colorFilter = tints.getOrPut(argb) { PorterDuffColorFilter(argb or 0xFF000000.toInt(), PorterDuff.Mode.SRC_IN) }
+            paint.alpha = (spot.strength.coerceIn(0f, 1f) * 255).toInt()
+            canvas.drawBitmap(blob, null, rect, paint)
+        }
+    }
+
+    override fun onSingleTapConfirmed(e: MotionEvent, mapView: MapView): Boolean {
+        val projection = mapView.projection
+        // Topmost (last drawn) first.
+        val hit = spots.lastOrNull { spot ->
+            if (spot.id == null) return@lastOrNull false
+            projection.toPixels(GeoPoint(spot.at.lat, spot.at.lon), point)
+            val r = projection.metersToPixels(spot.radiusM.toFloat(), spot.at.lat, projection.zoomLevel)
+            val dx = e.x - point.x
+            val dy = e.y - point.y
+            dx * dx + dy * dy <= r * r
+        } ?: return false
+        onSpotClick(hit.id!!)
+        return true
+    }
+
+    private companion object {
+        const val BLOB_PX = 128
     }
 }
 

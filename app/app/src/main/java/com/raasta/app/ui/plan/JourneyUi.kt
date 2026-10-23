@@ -62,6 +62,7 @@ import com.raasta.app.planner.Mode
 import com.raasta.app.planner.PlanResult
 import com.raasta.app.planner.Priority
 import com.raasta.app.planner.RankedJourney
+import com.raasta.app.planner.Source
 import com.raasta.app.planner.versusWaiting
 import com.raasta.app.ui.theme.AttentionAmber
 import com.raasta.app.ui.theme.ElectricLime
@@ -141,7 +142,14 @@ fun ModeStrip(journey: Journey) {
 
 /** One route option, Uber "choose a ride" style. */
 @Composable
-fun OptionRow(ranked: RankedJourney, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun OptionRow(
+    ranked: RankedJourney,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    /** Safety score of this option's safety route, once worked out. */
+    safetyScore: Int? = null,
+) {
     val journey = ranked.journey
     val shape = RoundedCornerShape(18.dp)
     Row(
@@ -172,7 +180,7 @@ fun OptionRow(ranked: RankedJourney, selected: Boolean, onClick: () -> Unit, mod
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            if (ranked.highlights.isNotEmpty() || journey.confidence != Confidence.HIGH) {
+            if (ranked.highlights.isNotEmpty() || journey.confidence != Confidence.HIGH || safetyScore != null) {
                 Row(
                     modifier = Modifier.horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -181,6 +189,7 @@ fun OptionRow(ranked: RankedJourney, selected: Boolean, onClick: () -> Unit, mod
                         Tag(stringResource(highlightLabel(it)), ElectricLime, outlined = true)
                     }
                     ConfidenceTag(journey.confidence)
+                    safetyScore?.let { Tag(stringResource(R.string.safety_tag, it), safetyColor(it), outlined = true) }
                 }
             }
         }
@@ -270,10 +279,13 @@ internal fun CautionRow(caution: Caution) {
 }
 
 @Composable
-internal fun SourcesList(corridor: Corridor) {
+internal fun SourcesList(corridor: Corridor) = SourcesList(corridor.sources)
+
+@Composable
+internal fun SourcesList(sources: List<Source>) {
     val uriHandler = LocalUriHandler.current
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        corridor.sources.forEach { source ->
+        sources.forEach { source ->
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

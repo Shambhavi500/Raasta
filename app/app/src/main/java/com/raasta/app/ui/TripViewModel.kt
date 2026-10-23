@@ -24,9 +24,18 @@ import com.raasta.app.planner.PlanResult
 import com.raasta.app.planner.Priority
 import com.raasta.app.planner.plan
 import com.raasta.app.planner.recover
+import com.raasta.app.safety.CrimeLayer
+import com.raasta.app.safety.JourneyRoutes
+import com.raasta.app.safety.JourneySafety
+import com.raasta.app.safety.RouteVariant
+import com.raasta.app.safety.SafeRouter
+import com.raasta.app.safety.SafetyModel
+import com.raasta.app.safety.StreetGraph
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 /** "My bus did not come" at [pointId]: plan from that stop instead of from an origin. */
@@ -40,6 +49,13 @@ data class TripProgress(
     val minutesToNextEvent: Int,
     val position: LatLon?,
 )
+
+/** Street safety data, loaded from assets in the background. */
+sealed interface SafetyStatus {
+    data object Loading : SafetyStatus
+    data class Ready(val safety: JourneySafety, val model: SafetyModel, val crime: CrimeLayer?) : SafetyStatus
+    data class Unavailable(val reason: String) : SafetyStatus
+}
 
 /** App-wide state for the Uber-style flow: pick places, compare routes, ride, arrive. */
 class TripViewModel(app: Application) : AndroidViewModel(app) {
@@ -62,6 +78,16 @@ class TripViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Road shapes for legs, keyed by leg; filled in as they arrive from the routing server. */
     val legShapes = mutableStateMapOf<Leg, List<LatLon>>()
+
+    var safetyStatus by mutableStateOf<SafetyStatus>(SafetyStatus.Loading)
+        private set
+    /** Shortest or safety streets for the walking and auto legs of the chosen option. */
+    var routeVariant by mutableStateOf(RouteVariant.SAFEST)
+    /** Shortest-vs-safety comparison per journey; a null value means the journey has no street legs to compare. */
+    val comparisons = mutableStateMapOf<Journey, JourneyRoutes?>()
+    private val comparing = mutableSetOf<Journey>()
+    var showCrowdHeat by mutableStateOf(false)
+    var showCrimeHeat by mutableStateOf(false)
 
     val startMinute: Int get() = departAt ?: nowMinute
 
@@ -106,6 +132,9 @@ class TripViewModel(app: Application) : AndroidViewModel(app) {
 
     init {
         viewModelScope.launch {
+            safetyStatus = withContext(Dispatchers.IO) { loadSafety(app) }
+        }
+        viewModelScope.launch {
             while (true) {
                 delay(15_000)
                 nowMinute = currentMinuteOfDay()
@@ -116,10 +145,41 @@ class TripViewModel(app: Application) : AndroidViewModel(app) {
     fun shapeOf(leg: Leg): List<LatLon> = legShapes[leg] ?: places.fallbackPath(leg)
 
     fun loadShapes(journey: Journey) {
+        val ready = safetyStatus as? SafetyStatus.Ready
         journey.legs.filter { it !in legShapes }.forEach { leg ->
-            viewModelScope.launch { legShapes[leg] = shapes.shape(leg) }
+            viewModelScope.launch {
+                // Walks and auto rides use the same street graph as the safety comparison.
+                val street = ready?.let { withContext(Dispatchers.Default) { it.safety.routesFor(leg) }?.shortest?.points }
+                val shape = street ?: shapes.shape(leg)
+                // A comparison may have filled this leg in meanwhile; it wins.
+                if (leg !in legShapes) legShapes[leg] = shape
+            }
         }
     }
+
+    /** Works out the shortest and safety streets for [journey], once. */
+    fun compareRoutes(journey: Journey) {
+        val ready = safetyStatus as? SafetyStatus.Ready ?: return
+        if (journey in comparisons || !comparing.add(journey)) return
+        viewModelScope.launch {
+            val routes = withContext(Dispatchers.Default) { ready.safety.compare(journey) }
+            routes?.let { legShapes.putAll(it.shapes) }
+            // Plans are rebuilt as the clock moves; keep only recent comparisons.
+            if (comparisons.size > MAX_COMPARISONS) comparisons.clear()
+            comparisons[journey] = routes
+            comparing -= journey
+        }
+    }
+
+    private fun loadSafety(app: Application): SafetyStatus = runCatching {
+        val graph = app.assets.open("street_graph.bin").use(StreetGraph::read)
+        // Routing still works on crowd alone if the crime file is missing or broken.
+        val crime = runCatching {
+            CrimeLayer.parse(app.assets.open("crime_zones.json").bufferedReader().use { it.readText() })
+        }.getOrNull()
+        val model = SafetyModel(graph, crime)
+        SafetyStatus.Ready(JourneySafety(SafeRouter(model), places, corridor.fares.autoFare), model, crime)
+    }.getOrElse { SafetyStatus.Unavailable(it.message ?: it.javaClass.simpleName) }
 
     fun chooseDestination(id: String) {
         destinationId = id
@@ -243,6 +303,7 @@ class TripViewModel(app: Application) : AndroidViewModel(app) {
 
     private companion object {
         const val TICK_MS = 100L
+        const val MAX_COMPARISONS = 60
     }
 }
 

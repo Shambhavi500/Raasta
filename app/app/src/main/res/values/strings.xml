@@ -194,4 +194,37 @@
     <string name="recover_where">Where are you waiting?</string>
     <string name="recover_stop_subtitle">Bus %1$s · %2$s away</string>
     <string name="recover_find">Find another way</string>
+
+    <!-- Shortest vs safety route -->
+    <string name="safety_shortest">Shortest</string>
+    <string name="safety_safest">Safety route</string>
+    <string name="safety_score">Safety %1$d/100</string>
+    <string name="safety_route_stats">%1$d min · %2$s on streets</string>
+    <string name="safety_checking">Checking streets for crime and crowds…</string>
+    <string name="safety_unavailable">Street safety data is not available. Showing normal routes.</string>
+    <string name="safety_no_streets">No walking or auto streets on this option to compare.</string>
+    <string name="safety_same">The shortest streets are also the safest here · Safety %1$d/100</string>
+    <string name="safety_busy">Busy streets %1$d%% → %2$d%%</string>
+    <string name="safety_crime">Crime zones %1$d%% → %2$d%%</string>
+    <string name="safety_extra_time">+%1$d min</string>
+    <string name="safety_no_extra_time">No extra time</string>
+    <string name="safety_note_demo">Crime zones are demo data, not real statistics. People activity is estimated from OpenStreetMap places and opening hours. Safer by this data, not a guarantee.</string>
+    <string name="safety_note_real">Crime: %1$s. People activity is estimated from OpenStreetMap places and opening hours. Safer by this data, not a guarantee.</string>
+    <string name="safety_tag">Safety %1$d</string>
+    <string name="heat_people">People</string>
+    <string name="heat_crime">Crime</string>
+    <string name="heat_crime_demo">Crime · demo</string>
+    <string name="legend_people">People around %1$s (estimate)</string>
+    <string name="legend_crime_demo">Crime zones · DEMO data, not real</string>
+    <string name="legend_crime">Crime zones · %1$s</string>
+    <string name="crime_low">Low</string>
+    <string name="crime_medium">Medium</string>
+    <string name="crime_high">High</string>
+    <string name="zone_level">%1$s crime level</string>
+    <string name="zone_cases">%1$d reported cases</string>
+    <string name="zone_period">Period: %1$s</string>
+    <string name="zone_category">Category: %1$s</string>
+    <string name="zone_source">Source: %1$s · %2$s</string>
+    <string name="safety_sources_header">Street safety data</string>
+    <string name="action_close">Close</string>
 </resources>
