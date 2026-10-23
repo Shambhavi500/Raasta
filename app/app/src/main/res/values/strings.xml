@@ -1,0 +1,120 @@
+<resources>
+    <string name="app_name">Raasta</string>
+
+    <string name="action_back">Back</string>
+
+    <!-- Demo login -->
+    <string name="login_tagline">Find another way when your trip goes wrong.</string>
+    <string name="demo_banner">Demo mode: no SMS is sent. Use code %1$s.</string>
+    <string name="login_phone_label">Mobile number</string>
+    <string name="login_phone_prefix">+91</string>
+    <string name="login_phone_invalid">Enter a 10-digit Indian mobile number</string>
+    <string name="login_send_otp">Send OTP</string>
+    <string name="login_otp_sent_to">Enter the 6-digit code for %1$s</string>
+    <string name="login_otp_label">OTP</string>
+    <string name="login_otp_wrong">That code is not correct</string>
+    <string name="login_verify">Verify and continue</string>
+    <string name="login_change_number">Change number</string>
+
+    <!-- Home -->
+    <string name="home_signed_in_as">Signed in as %1$s</string>
+    <string name="home_sign_out">Sign out</string>
+    <string name="home_question">What do you need right now?</string>
+    <string name="home_plan_title">Plan my trip</string>
+    <string name="home_plan_subtitle">Compare bus, metro and auto options</string>
+    <string name="home_recover_title">My connection failed</string>
+    <string name="home_recover_subtitle">Find another way from where you are</string>
+
+    <!-- Trip planning -->
+    <string name="plan_corridor_note">Demo corridor: %1$s. Data built on %2$s.</string>
+    <string name="plan_from">From</string>
+    <string name="plan_to">To</string>
+    <string name="plan_leave_at">Leave at</string>
+    <string name="plan_priority">What matters most</string>
+    <string name="leave_now">Now (%1$s)</string>
+    <string name="leave_1800">6:00 PM</string>
+    <string name="leave_2130">9:30 PM</string>
+    <string name="leave_2330">11:30 PM</string>
+    <string name="priority_balanced">Balanced</string>
+    <string name="priority_cheapest">Cheapest</string>
+    <string name="priority_least_waiting">Least waiting</string>
+    <string name="priority_fewest_changes">Fewest changes</string>
+    <string name="plan_results_header">%1$d options, best first</string>
+    <string name="plan_no_results">No options found for this time.</string>
+
+    <string name="journey_bus_metro">Bus %1$s + Metro</string>
+    <string name="journey_auto_metro">Auto + Metro</string>
+    <string name="journey_auto_direct">Auto all the way</string>
+    <string name="journey_arrive">Leave %1$s · arrive %2$s</string>
+    <string name="journey_minutes">%1$d min</string>
+    <string name="journey_fare">₹%1$d</string>
+    <string name="journey_metrics">Wait %1$d min · Walk %2$s · %3$d change(s)</string>
+    <string name="journey_show_steps">Show steps</string>
+    <string name="journey_hide_steps">Hide steps</string>
+
+    <string name="confidence_high">High confidence</string>
+    <string name="confidence_medium">Medium confidence</string>
+    <string name="confidence_low">Low confidence</string>
+    <string name="highlight_fastest">Fastest</string>
+    <string name="highlight_cheapest">Cheapest</string>
+    <string name="highlight_least_waiting">Least waiting</string>
+    <string name="highlight_fewest_changes">Fewest changes</string>
+
+    <string name="mode_walk">WALK</string>
+    <string name="mode_bus">BUS</string>
+    <string name="mode_metro">METRO</string>
+    <string name="mode_auto">AUTO</string>
+    <string name="leg_walk">Walk to %1$s</string>
+    <string name="leg_bus">Bus %1$s to %2$s</string>
+    <string name="leg_metro">%1$s to %2$s</string>
+    <string name="leg_auto">Auto to %1$s</string>
+    <string name="leg_wait">wait %1$d min</string>
+    <string name="basis_time">Time: %1$s</string>
+    <string name="basis_fare">Fare: %1$s</string>
+    <string name="basis_timetable">Timetable</string>
+    <string name="basis_official_fare">Official chart</string>
+    <string name="basis_reported">Reported</string>
+    <string name="basis_estimate">Estimate</string>
+    <string name="basis_map_route">Map route</string>
+
+    <string name="caution_timetable_ends">Bus %1$s: the timetable data lists no trips after %2$s, so this wait assumes the daytime frequency continues.</string>
+    <string name="caution_bus_fare_unknown">Bus %1$s: this trip is longer than the known fare slabs.</string>
+    <string name="caution_metro_last_train">Last metro is reported as 10–11 PM. Check before relying on it.</string>
+    <string name="caution_auto_availability">Auto availability and pickup time are not known.</string>
+    <string name="caution_auto_night">Includes the 25% night surcharge (12 AM–5 AM).</string>
+
+    <string name="unavailable_header">Not available at this time</string>
+    <string name="unavailable_metro">%1$s: you would reach the metro after it stops running (reported hours %2$s–%3$s).</string>
+
+    <string name="sources_header">Where these numbers come from</string>
+    <string name="sources_show">Show sources</string>
+    <string name="sources_hide">Hide sources</string>
+    <string name="source_retrieved">Retrieved %1$s</string>
+
+    <string name="distance_m">%1$d m</string>
+    <string name="distance_km">%1$.1f km</string>
+    <string name="clock_next_day">%1$s (+1 day)</string>
+
+    <!-- Journey recovery -->
+    <string name="recover_intro">Tell us where you are and which bus did not come. Raasta compares waiting with every other way to get there.</string>
+    <string name="recover_at">I\'m at (bus stop)</string>
+    <string name="recover_failed_bus">Bus that did not come</string>
+    <string name="recover_going_to">Going to</string>
+    <string name="recover_time_now">Time now</string>
+    <string name="recover_now">Now (%1$s)</string>
+    <string name="recover_1840">6:40 PM</string>
+    <string name="recover_2150">9:50 PM</string>
+    <string name="recover_2240">10:40 PM</string>
+    <string name="recover_bus_route">Bus %1$s</string>
+    <string name="recover_title_switch">Don\'t wait for bus %1$s</string>
+    <string name="recover_title_wait">Waiting for bus %1$s is still your best option</string>
+    <string name="recover_title_generic">Best option right now</string>
+    <string name="recover_sooner_more">%1$s gets you there %2$d min sooner than waiting, for ₹%3$d more.</string>
+    <string name="recover_sooner_less">%1$s gets you there %2$d min sooner than waiting, and costs ₹%3$d less.</string>
+    <string name="recover_sooner_same">%1$s gets you there %2$d min sooner than waiting, for the same fare.</string>
+    <string name="recover_not_sooner">%1$s ranks first for what matters most to you, though waiting may arrive %2$d min sooner.</string>
+    <string name="recover_wait_explained">The next bus %1$s still beats the other options for what matters most to you. Check the warnings before you decide.</string>
+    <string name="recover_best_generic">%1$s ranks first. Waiting for bus %2$s would not get you there before the metro stops.</string>
+    <string name="journey_keep_waiting">Keep waiting for bus %1$s</string>
+    <string name="caution_failed_route">Bus %1$s just did not come; the next one may also be late or missing.</string>
+</resources>

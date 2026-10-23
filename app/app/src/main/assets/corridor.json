@@ -1,0 +1,814 @@
+{
+  "corridor": "Kharadi to Kothrud / Deccan via Ramwadi Metro (Aqua Line)",
+  "generatedOn": "2026-10-23",
+  "sources": [
+    {
+      "id": "metro_fare",
+      "title": "Pune Metro official fare chart",
+      "url": "https://www.punemetrorail.org/fare_chart.aspx",
+      "retrieved": "2026-10-23",
+      "note": "Station-to-station fares transcribed from the published chart image (undated)."
+    },
+    {
+      "id": "pmpml_fare",
+      "title": "PMPML fare revision from 1 June 2025 (Punekar News)",
+      "url": "https://www.punekarnews.in/pune-pmpml-fare-hike-comes-into-effect-from-today-daily-and-monthly-passes-get-costlier/",
+      "retrieved": "2026-10-23",
+      "note": "First four 5 km slabs as reported. PMPML's official Marathi press note was not verified."
+    },
+    {
+      "id": "auto_fare",
+      "title": "Pune RTA auto-rickshaw fare revision from 1 September 2026 (Free Press Journal)",
+      "url": "https://www.freepressjournal.in/pune/pune-rta-approves-autorickshaw-fare-hike-from-september-1",
+      "retrieved": "2026-10-23",
+      "note": "Rs 30 for the first 1.5 km, Rs 20 per km after; 25% night surcharge 12 AM to 5 AM within Pune and PCMC."
+    },
+    {
+      "id": "metro_service",
+      "title": "Pune Metro Aqua Line timings (Housing.com, secondary source)",
+      "url": "https://housing.com/news/pune-metro-aqua-line-line-2-route-map-timings-fare/",
+      "retrieved": "2026-10-23",
+      "note": "About 6 AM to 10-11 PM; every 7.5 min at peak and 10 min off-peak. Not an official timetable."
+    },
+    {
+      "id": "metro_length",
+      "title": "Pune Metro Aqua Line length (Wikipedia)",
+      "url": "https://en.wikipedia.org/wiki/Pune_Metro",
+      "retrieved": "2026-10-23",
+      "note": "Vanaz to Ramwadi is 14.66 km; used to scale straight-line station distances."
+    },
+    {
+      "id": "pmpml_gtfs",
+      "title": "PMPML static GTFS (community-built, blrtransit.com)",
+      "url": "https://rt-bucket.blrtransit.com/rt/control/static/gtfs.zip",
+      "retrieved": "2026-10-23",
+      "note": "Unofficial and not exhaustive; very few trips are listed after 4 PM. Feed valid 20260819 to 20270215."
+    },
+    {
+      "id": "osm",
+      "title": "Metro station locations from OpenStreetMap (Nominatim)",
+      "url": "https://www.openstreetmap.org/copyright",
+      "retrieved": "2026-10-23",
+      "note": "Map data (c) OpenStreetMap contributors, ODbL."
+    },
+    {
+      "id": "osrm",
+      "title": "Walking and driving routes from OSRM (routing.openstreetmap.de)",
+      "url": "https://routing.openstreetmap.de/about.html",
+      "retrieved": "2026-10-23",
+      "note": "Computed on OpenStreetMap data. Auto distance uses the car profile."
+    }
+  ],
+  "fares": {
+    "pmpmlFareSlabs": [
+      {
+        "upToKm": 5,
+        "fare": 10
+      },
+      {
+        "upToKm": 10,
+        "fare": 20
+      },
+      {
+        "upToKm": 15,
+        "fare": 30
+      },
+      {
+        "upToKm": 20,
+        "fare": 40
+      }
+    ],
+    "autoFare": {
+      "baseFare": 30,
+      "baseKm": 1.5,
+      "perKm": 20,
+      "nightSurchargePercent": 25,
+      "nightStart": "00:00",
+      "nightEnd": "05:00"
+    }
+  },
+  "metro": {
+    "line": "Aqua Line",
+    "transferStation": "Ramwadi",
+    "stations": [
+      {
+        "name": "Ramwadi",
+        "lat": 18.557028,
+        "lon": 73.9085628,
+        "osmName": "Ramwadi",
+        "fareFromRamwadi": 0,
+        "kmFromRamwadi": 0.0
+      },
+      {
+        "name": "Kalyani Nagar",
+        "lat": 18.5444806,
+        "lon": 73.9056979,
+        "osmName": "Kalyani Nagar",
+        "fareFromRamwadi": 10,
+        "kmFromRamwadi": 1.52
+      },
+      {
+        "name": "Yerwada",
+        "lat": 18.5453173,
+        "lon": 73.8866882,
+        "osmName": "Yerwada",
+        "fareFromRamwadi": 15,
+        "kmFromRamwadi": 3.66
+      },
+      {
+        "name": "Bund Garden",
+        "lat": 18.5405933,
+        "lon": 73.8834394,
+        "osmName": "Bund Garden",
+        "fareFromRamwadi": 20,
+        "kmFromRamwadi": 4.33
+      },
+      {
+        "name": "Ruby Hall Clinic",
+        "lat": 18.5327176,
+        "lon": 73.8777486,
+        "osmName": "Ruby Hall Clinic",
+        "fareFromRamwadi": 20,
+        "kmFromRamwadi": 5.47
+      },
+      {
+        "name": "Pune Railway Station",
+        "lat": 18.5297592,
+        "lon": 73.8724091,
+        "osmName": "Pune Railway Station",
+        "fareFromRamwadi": 25,
+        "kmFromRamwadi": 6.16
+      },
+      {
+        "name": "R.T.O.",
+        "lat": 18.5300759,
+        "lon": 73.8651028,
+        "osmName": "Mangalwar Peth",
+        "fareFromRamwadi": 25,
+        "kmFromRamwadi": 6.98
+      },
+      {
+        "name": "District Court",
+        "lat": 18.5267201,
+        "lon": 73.8577478,
+        "osmName": "District Court (Aqua Line)",
+        "fareFromRamwadi": 25,
+        "kmFromRamwadi": 7.9
+      },
+      {
+        "name": "PMC",
+        "lat": 18.5227443,
+        "lon": 73.8533499,
+        "osmName": "PMC Bhavan",
+        "fareFromRamwadi": 25,
+        "kmFromRamwadi": 8.59
+      },
+      {
+        "name": "Chhatrapati Sambhaji Udyan",
+        "lat": 18.5200806,
+        "lon": 73.847383,
+        "osmName": "Chhatrapati Sambhaji Udyan",
+        "fareFromRamwadi": 25,
+        "kmFromRamwadi": 9.33
+      },
+      {
+        "name": "Deccan Gymkhana",
+        "lat": 18.5164485,
+        "lon": 73.8444458,
+        "osmName": "Deccan Gymkhana",
+        "fareFromRamwadi": 25,
+        "kmFromRamwadi": 9.87
+      },
+      {
+        "name": "Garware College",
+        "lat": 18.5119886,
+        "lon": 73.8380505,
+        "osmName": "Garware College",
+        "fareFromRamwadi": 25,
+        "kmFromRamwadi": 10.76
+      },
+      {
+        "name": "S.N.D.T. College",
+        "lat": 18.5073567,
+        "lon": 73.8287815,
+        "osmName": "SNDT College",
+        "fareFromRamwadi": 25,
+        "kmFromRamwadi": 11.94
+      },
+      {
+        "name": "Paud Phata",
+        "lat": 18.508885,
+        "lon": 73.822144,
+        "osmName": "Paud Phata",
+        "fareFromRamwadi": 30,
+        "kmFromRamwadi": 12.71
+      },
+      {
+        "name": "Anand Nagar",
+        "lat": 18.5095724,
+        "lon": 73.8140749,
+        "osmName": "Anandnagar",
+        "fareFromRamwadi": 30,
+        "kmFromRamwadi": 13.62
+      },
+      {
+        "name": "Vanaz",
+        "lat": 18.5071853,
+        "lon": 73.8051948,
+        "osmName": "Vanaz",
+        "fareFromRamwadi": 30,
+        "kmFromRamwadi": 14.66
+      }
+    ],
+    "service": {
+      "firstTrain": "06:00",
+      "lastTrainEarliest": "22:00",
+      "lastTrainLatest": "23:00",
+      "headwayPeakMin": 7.5,
+      "headwayOffPeakMin": 10,
+      "peakWindows": [
+        [
+          "08:00",
+          "11:00"
+        ],
+        [
+          "16:00",
+          "20:00"
+        ]
+      ]
+    }
+  },
+  "assumptions": {
+    "metroAvgSpeedKmh": 30,
+    "stationEntryMin": 3,
+    "autoAvgSpeedKmh": 20,
+    "autoPickupWaitMin": 5
+  },
+  "origins": [
+    {
+      "id": "wtc",
+      "name": "World Trade Center, Kharadi",
+      "lat": 18.5529,
+      "lon": 73.9478,
+      "accessToMetro": [
+        {
+          "type": "bus",
+          "route": "234",
+          "routeName": "Dhole Patil Collage to Ma Na Pa Shramik Bhavan (UP)",
+          "boardStop": {
+            "name": "World Trade Center",
+            "lat": 18.5529,
+            "lon": 73.9478
+          },
+          "alightStop": {
+            "name": "Ramwadi Metro Station",
+            "lat": 18.5572110925839,
+            "lon": 73.9086797833443
+          },
+          "rideKm": 5.57,
+          "rideMin": 18.5,
+          "departures": [
+            "06:27",
+            "07:17",
+            "08:02",
+            "08:52",
+            "09:32",
+            "10:22",
+            "11:12",
+            "11:57",
+            "12:17",
+            "13:02",
+            "13:52",
+            "14:37"
+          ],
+          "medianHeadwayMin": 45.0,
+          "walkToStopM": 0,
+          "walkToStopMin": 0.0,
+          "walkToStationM": 92,
+          "walkToStationMin": 1.2
+        },
+        {
+          "type": "bus",
+          "route": "235",
+          "routeName": "Kharadi Gaon to Katraj (UP)",
+          "boardStop": {
+            "name": "Kharadi Gaon",
+            "lat": 18.5483518382359,
+            "lon": 73.9459813117871
+          },
+          "alightStop": {
+            "name": "Ramwadi Metro Station",
+            "lat": 18.5566237160529,
+            "lon": 73.908084332943
+          },
+          "rideKm": 4.9,
+          "rideMin": 16.0,
+          "departures": [
+            "06:35",
+            "06:50",
+            "07:10",
+            "07:30",
+            "07:50",
+            "08:05",
+            "08:25",
+            "09:05",
+            "09:20",
+            "09:30",
+            "09:50",
+            "10:10",
+            "10:30",
+            "10:45",
+            "11:05",
+            "11:20",
+            "12:15",
+            "12:35",
+            "13:00",
+            "13:20",
+            "13:40",
+            "14:00",
+            "14:15",
+            "14:35",
+            "14:50",
+            "15:40",
+            "16:00"
+          ],
+          "medianHeadwayMin": 20.0,
+          "walkToStopM": 626,
+          "walkToStopMin": 8.3,
+          "walkToStationM": 67,
+          "walkToStationMin": 0.9
+        },
+        {
+          "type": "bus",
+          "route": "METRO SHUTTLE 20",
+          "routeName": "PANCHSHIL TOWERS E VON GATE NO. 2 Kharadi to Ramwadi Metro Station (UP)",
+          "boardStop": {
+            "name": "World Trade Center No. 3 Kharadi",
+            "lat": 18.5514108992367,
+            "lon": 73.947519821103
+          },
+          "alightStop": {
+            "name": "Ramwadi Metro Station",
+            "lat": 18.5572110925839,
+            "lon": 73.9086797833443
+          },
+          "rideKm": 6.36,
+          "rideMin": 20.5,
+          "departures": [
+            "06:11",
+            "08:31",
+            "10:51",
+            "13:11",
+            "15:31",
+            "17:51",
+            "20:11"
+          ],
+          "medianHeadwayMin": 140.0,
+          "walkToStopM": 363,
+          "walkToStopMin": 4.8,
+          "walkToStationM": 92,
+          "walkToStationMin": 1.2
+        },
+        {
+          "type": "auto",
+          "km": 6.21,
+          "freeFlowMin": 5.7
+        }
+      ]
+    },
+    {
+      "id": "eon",
+      "name": "EON IT Park Phase 2, Kharadi",
+      "lat": 18.5525,
+      "lon": 73.955902,
+      "accessToMetro": [
+        {
+          "type": "bus",
+          "route": "234",
+          "routeName": "Dhole Patil Collage to Ma Na Pa Shramik Bhavan (UP)",
+          "boardStop": {
+            "name": "Eon Phase 2",
+            "lat": 18.5525,
+            "lon": 73.955902
+          },
+          "alightStop": {
+            "name": "Ramwadi Metro Station",
+            "lat": 18.5572110925839,
+            "lon": 73.9086797833443
+          },
+          "rideKm": 8.65,
+          "rideMin": 28.3,
+          "departures": [
+            "06:18",
+            "07:08",
+            "07:53",
+            "08:43",
+            "09:23",
+            "10:13",
+            "11:03",
+            "11:48",
+            "12:08",
+            "12:53",
+            "13:43",
+            "14:28"
+          ],
+          "medianHeadwayMin": 45.0,
+          "walkToStopM": 0,
+          "walkToStopMin": 0.0,
+          "walkToStationM": 92,
+          "walkToStationMin": 1.2
+        },
+        {
+          "type": "bus",
+          "route": "METRO SHUTTLE 20",
+          "routeName": "PANCHSHIL TOWERS E VON GATE NO. 2 Kharadi to Ramwadi Metro Station (UP)",
+          "boardStop": {
+            "name": "Common Zone Kharadi",
+            "lat": 18.554337,
+            "lon": 73.955437
+          },
+          "alightStop": {
+            "name": "Ramwadi Metro Station",
+            "lat": 18.5572110925839,
+            "lon": 73.9086797833443
+          },
+          "rideKm": 7.54,
+          "rideMin": 24.7,
+          "departures": [
+            "06:06",
+            "08:26",
+            "10:46",
+            "13:06",
+            "15:26",
+            "17:46",
+            "20:06"
+          ],
+          "medianHeadwayMin": 140.0,
+          "walkToStopM": 222,
+          "walkToStopMin": 3.0,
+          "walkToStationM": 92,
+          "walkToStationMin": 1.2
+        },
+        {
+          "type": "auto",
+          "km": 6.8,
+          "freeFlowMin": 5.9
+        }
+      ]
+    }
+  ],
+  "destinations": [
+    {
+      "id": "vanaj",
+      "name": "Vanaj Corner, Kothrud",
+      "lat": 18.5075,
+      "lon": 73.807503,
+      "metroStation": "Vanaz",
+      "walkFromStationM": 262,
+      "walkFromStationMin": 3.5
+    },
+    {
+      "id": "anand",
+      "name": "Anand Nagar, Kothrud",
+      "lat": 18.509708,
+      "lon": 73.814425,
+      "metroStation": "Anand Nagar",
+      "walkFromStationM": 328,
+      "walkFromStationMin": 4.4
+    },
+    {
+      "id": "deccan",
+      "name": "Deccan Gymkhana",
+      "lat": 18.516678,
+      "lon": 73.843003,
+      "metroStation": "Deccan Gymkhana",
+      "walkFromStationM": 306,
+      "walkFromStationMin": 4.1
+    }
+  ],
+  "autoDirect": [
+    {
+      "origin": "wtc",
+      "destination": "vanaj",
+      "km": 20.32,
+      "freeFlowMin": 20.2
+    },
+    {
+      "origin": "wtc",
+      "destination": "anand",
+      "km": 19.72,
+      "freeFlowMin": 19.6
+    },
+    {
+      "origin": "wtc",
+      "destination": "deccan",
+      "km": 15.54,
+      "freeFlowMin": 15.3
+    },
+    {
+      "origin": "eon",
+      "destination": "vanaj",
+      "km": 20.92,
+      "freeFlowMin": 20.4
+    },
+    {
+      "origin": "eon",
+      "destination": "anand",
+      "km": 20.31,
+      "freeFlowMin": 19.8
+    },
+    {
+      "origin": "eon",
+      "destination": "deccan",
+      "km": 16.14,
+      "freeFlowMin": 15.5
+    }
+  ],
+  "recoveryPoints": [
+    {
+      "id": "world_trade_center",
+      "name": "World Trade Center",
+      "lat": 18.5529,
+      "lon": 73.9478,
+      "routes": [
+        "234"
+      ],
+      "walksToStops": [
+        {
+          "to": "World Trade Center",
+          "m": 0,
+          "min": 0.0
+        },
+        {
+          "to": "Kharadi Gaon",
+          "m": 626,
+          "min": 8.3
+        },
+        {
+          "to": "World Trade Center No. 3 Kharadi",
+          "m": 363,
+          "min": 4.8
+        },
+        {
+          "to": "Eon Phase 2",
+          "m": 1136,
+          "min": 15.1
+        },
+        {
+          "to": "Common Zone Kharadi",
+          "m": 915,
+          "min": 12.2
+        }
+      ],
+      "autoToTransfer": {
+        "km": 6.21,
+        "freeFlowMin": 5.7
+      },
+      "autoToDestinations": [
+        {
+          "destination": "vanaj",
+          "km": 20.32,
+          "freeFlowMin": 20.2
+        },
+        {
+          "destination": "anand",
+          "km": 19.72,
+          "freeFlowMin": 19.6
+        },
+        {
+          "destination": "deccan",
+          "km": 15.54,
+          "freeFlowMin": 15.3
+        }
+      ]
+    },
+    {
+      "id": "kharadi_gaon",
+      "name": "Kharadi Gaon",
+      "lat": 18.5483518382359,
+      "lon": 73.9459813117871,
+      "routes": [
+        "235"
+      ],
+      "walksToStops": [
+        {
+          "to": "World Trade Center",
+          "m": 626,
+          "min": 8.3
+        },
+        {
+          "to": "Kharadi Gaon",
+          "m": 0,
+          "min": 0.0
+        },
+        {
+          "to": "World Trade Center No. 3 Kharadi",
+          "m": 447,
+          "min": 6.0
+        },
+        {
+          "to": "Eon Phase 2",
+          "m": 1384,
+          "min": 18.5
+        },
+        {
+          "to": "Common Zone Kharadi",
+          "m": 1480,
+          "min": 19.7
+        }
+      ],
+      "autoToTransfer": {
+        "km": 5.56,
+        "freeFlowMin": 4.8
+      },
+      "autoToDestinations": [
+        {
+          "destination": "vanaj",
+          "km": 19.68,
+          "freeFlowMin": 19.2
+        },
+        {
+          "destination": "anand",
+          "km": 19.07,
+          "freeFlowMin": 18.7
+        },
+        {
+          "destination": "deccan",
+          "km": 14.9,
+          "freeFlowMin": 14.3
+        }
+      ]
+    },
+    {
+      "id": "world_trade_center_no_3_kharadi",
+      "name": "World Trade Center No. 3 Kharadi",
+      "lat": 18.5514108992367,
+      "lon": 73.947519821103,
+      "routes": [
+        "METRO SHUTTLE 20"
+      ],
+      "walksToStops": [
+        {
+          "to": "World Trade Center",
+          "m": 363,
+          "min": 4.8
+        },
+        {
+          "to": "Kharadi Gaon",
+          "m": 447,
+          "min": 6.0
+        },
+        {
+          "to": "World Trade Center No. 3 Kharadi",
+          "m": 0,
+          "min": 0.0
+        },
+        {
+          "to": "Eon Phase 2",
+          "m": 1327,
+          "min": 17.7
+        },
+        {
+          "to": "Common Zone Kharadi",
+          "m": 1105,
+          "min": 14.7
+        }
+      ],
+      "autoToTransfer": {
+        "km": 5.51,
+        "freeFlowMin": 5.6
+      },
+      "autoToDestinations": [
+        {
+          "destination": "vanaj",
+          "km": 19.62,
+          "freeFlowMin": 20.0
+        },
+        {
+          "destination": "anand",
+          "km": 19.01,
+          "freeFlowMin": 19.5
+        },
+        {
+          "destination": "deccan",
+          "km": 14.84,
+          "freeFlowMin": 15.1
+        }
+      ]
+    },
+    {
+      "id": "eon_phase_2",
+      "name": "Eon Phase 2",
+      "lat": 18.5525,
+      "lon": 73.955902,
+      "routes": [
+        "234"
+      ],
+      "walksToStops": [
+        {
+          "to": "World Trade Center",
+          "m": 1136,
+          "min": 15.1
+        },
+        {
+          "to": "Kharadi Gaon",
+          "m": 1384,
+          "min": 18.5
+        },
+        {
+          "to": "World Trade Center No. 3 Kharadi",
+          "m": 1327,
+          "min": 17.7
+        },
+        {
+          "to": "Eon Phase 2",
+          "m": 0,
+          "min": 0.0
+        },
+        {
+          "to": "Common Zone Kharadi",
+          "m": 222,
+          "min": 3.0
+        }
+      ],
+      "autoToTransfer": {
+        "km": 6.8,
+        "freeFlowMin": 5.9
+      },
+      "autoToDestinations": [
+        {
+          "destination": "vanaj",
+          "km": 20.92,
+          "freeFlowMin": 20.4
+        },
+        {
+          "destination": "anand",
+          "km": 20.31,
+          "freeFlowMin": 19.8
+        },
+        {
+          "destination": "deccan",
+          "km": 16.14,
+          "freeFlowMin": 15.5
+        }
+      ]
+    },
+    {
+      "id": "common_zone_kharadi",
+      "name": "Common Zone Kharadi",
+      "lat": 18.554337,
+      "lon": 73.955437,
+      "routes": [
+        "METRO SHUTTLE 20"
+      ],
+      "walksToStops": [
+        {
+          "to": "World Trade Center",
+          "m": 915,
+          "min": 12.2
+        },
+        {
+          "to": "Kharadi Gaon",
+          "m": 1480,
+          "min": 19.7
+        },
+        {
+          "to": "World Trade Center No. 3 Kharadi",
+          "m": 1105,
+          "min": 14.7
+        },
+        {
+          "to": "Eon Phase 2",
+          "m": 222,
+          "min": 3.0
+        },
+        {
+          "to": "Common Zone Kharadi",
+          "m": 0,
+          "min": 0.0
+        }
+      ],
+      "autoToTransfer": {
+        "km": 6.62,
+        "freeFlowMin": 5.8
+      },
+      "autoToDestinations": [
+        {
+          "destination": "vanaj",
+          "km": 20.73,
+          "freeFlowMin": 20.3
+        },
+        {
+          "destination": "anand",
+          "km": 20.13,
+          "freeFlowMin": 19.8
+        },
+        {
+          "destination": "deccan",
+          "km": 15.95,
+          "freeFlowMin": 15.4
+        }
+      ]
+    }
+  ]
+}

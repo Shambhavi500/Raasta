@@ -1,0 +1,27 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.vscode/
+
+# Android / Gradle build output (app/.gitignore covers Android Studio files)
+.gradle/
+.kotlin/
+build/
+captures/
+local.properties
+*.apk
+*.aab
+
+# Signing keys and secrets
+*.jks
+*.keystore
+.env
+*.env
+secrets.properties
+
+# Python (tools/)
+__pycache__/
+*.pyc
+.venv/
