@@ -100,7 +100,7 @@ class RouterTest {
     fun readsTheBinaryFormatTheBuildScriptWrites() {
         val bytes = ByteArrayOutputStream()
         DataOutputStream(bytes).use { out ->
-            out.writeBytes("RSG1")
+            out.writeBytes("RSG2")
             out.writeUTF("""{"generatedOn":"2026-10-24","classes":${RoadClass.entries.map { "\"${it.name.lowercase()}\"" }},"sources":[]}""")
             out.writeInt(2)
             out.writeInt(18_501_000); out.writeInt(73_800_000)
@@ -109,17 +109,20 @@ class RouterTest {
             out.writeInt(0); out.writeInt(1); out.writeFloat(105.5f)
             out.writeByte(RoadClass.PRIMARY.ordinal); out.writeByte(1 or 2 or 4)
             repeat(24) { out.writeByte(if (it == 10) 3 else 0) }
+            out.writeByte(2); out.writeByte(1); out.writeByte(4); out.writeByte(3) // all-day, late help, transit, cameras
             out.writeShort(1); out.writeInt(18_501_100); out.writeInt(73_800_500)
             out.writeInt(1)
-            out.writeInt(18_501_000); out.writeInt(73_800_000); out.writeInt(1 shl 10)
+            out.writeInt(18_501_000); out.writeInt(73_800_000); out.writeInt(1 shl 10); out.writeByte(PlaceKind.PHARMACY.ordinal)
         }
         val graph = StreetGraph.read(ByteArrayInputStream(bytes.toByteArray()))
         val street = graph.streets.single()
         assertEquals(RoadClass.PRIMARY, street.roadClass)
         assertTrue(street.foot && street.car && street.oneway)
         assertEquals(3, street.openByHour[10])
+        assertEquals(listOf(2, 1, 4, 3), listOf(street.allDay, street.lateHelp, street.transit, street.cameras))
         assertEquals(LatLon(18.5011, 73.8005), street.via.single())
         assertTrue(graph.places.single().openAt(10))
+        assertEquals(PlaceKind.PHARMACY, graph.places.single().kind)
         assertNotNull(graph.meta.generatedOn)
     }
 }

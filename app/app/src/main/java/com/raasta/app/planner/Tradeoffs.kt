@@ -14,6 +14,10 @@ sealed interface Point {
     data class MoreChanges(val changes: Int) : Point
     data class SaferStreets(val score: Int, val otherScore: Int) : Point
     data class LessSafeStreets(val score: Int, val otherScore: Int) : Point
+    data class ShorterDarkStretch(val metres: Int, val otherMetres: Int) : Point
+    data class LongerDarkStretch(val metres: Int, val otherMetres: Int) : Point
+    data class MoreOpenPlaces(val count: Int, val otherCount: Int) : Point
+    data class FewerOpenPlaces(val count: Int, val otherCount: Int) : Point
     data object ReliableData : Point
     data object MostlyEstimates : Point
     data class LongWait(val min: Int) : Point
@@ -23,6 +27,9 @@ sealed interface Point {
 
 data class Tradeoffs(val pros: List<Point>, val cons: List<Point>)
 
+/** What the chosen streets pass: the longest stretch with nothing open or watching, and open places beside them. */
+data class StreetFacts(val longestGapM: Int, val openPlaces: Int)
+
 object Compare {
     // Differences smaller than these are not worth mentioning.
     private const val MIN_TIME = 3
@@ -30,6 +37,8 @@ object Compare {
     private const val MIN_WAIT = 3
     private const val MIN_WALK_M = 150
     private const val MIN_SAFETY = 3
+    private const val MIN_GAP_M = 100
+    private const val MIN_PLACES = 3
     private const val LONG_WAIT_MIN = 15
     private const val LONG_WALK_M = 1000
 
@@ -43,6 +52,8 @@ object Compare {
         evidence: List<Evidence> = emptyList(),
         safety: Int? = null,
         referenceSafety: Int? = null,
+        facts: StreetFacts? = null,
+        referenceFacts: StreetFacts? = null,
     ): Tradeoffs {
         val pros = mutableListOf<Point>()
         val cons = mutableListOf<Point>()
@@ -55,6 +66,14 @@ object Compare {
             if (safety != null && referenceSafety != null) {
                 if (safety - referenceSafety >= MIN_SAFETY) pros += Point.SaferStreets(safety, referenceSafety)
                 if (referenceSafety - safety >= MIN_SAFETY) cons += Point.LessSafeStreets(safety, referenceSafety)
+            }
+            if (facts != null && referenceFacts != null) {
+                val gap = referenceFacts.longestGapM - facts.longestGapM
+                if (gap >= MIN_GAP_M) pros += Point.ShorterDarkStretch(facts.longestGapM, referenceFacts.longestGapM)
+                if (-gap >= MIN_GAP_M) cons += Point.LongerDarkStretch(facts.longestGapM, referenceFacts.longestGapM)
+                val places = facts.openPlaces - referenceFacts.openPlaces
+                if (places >= MIN_PLACES) pros += Point.MoreOpenPlaces(facts.openPlaces, referenceFacts.openPlaces)
+                if (-places >= MIN_PLACES) cons += Point.FewerOpenPlaces(facts.openPlaces, referenceFacts.openPlaces)
             }
         }
         when (option.confidence) {

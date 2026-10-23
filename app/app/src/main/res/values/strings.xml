@@ -245,8 +245,8 @@
     <string name="detail_live">No live bus or metro positions are available. During the journey Raasta will ask you when a bus is due.</string>
     <string name="detail_reports_none">No verified rider reports for these routes.</string>
     <string name="detail_reports">%1$d verified report(s) used · %2$d waiting for review and not used.</string>
-    <string name="detail_safety">Street activity from OpenStreetMap and official crime data.</string>
-    <string name="detail_safety_demo">Street activity is estimated from OpenStreetMap places and opening hours. Crime zones are synthetic demo data.</string>
+    <string name="detail_safety">Street activity, help points and cameras from OpenStreetMap, plus official crime data. Few cameras are mapped, so a street with none is not necessarily unwatched.</string>
+    <string name="detail_safety_demo">Street activity is estimated from OpenStreetMap places, typical opening hours where none are tagged, late-night help points and the few cameras mapped. Crime zones are synthetic demo data.</string>
     <string name="detail_safety_unavailable">Street safety data could not be loaded, so routes are ranked without it.</string>
     <string name="detail_step_free">Lifts and step-free access at stations are not known. Ranking uses walking distance and changes instead.</string>
     <string name="detail_auto_availability">Whether an auto is available and how long pickup takes are not known.</string>
@@ -279,6 +279,10 @@
     </plurals>
     <string name="point_safer">Safer streets: %1$d/100 vs %2$d/100</string>
     <string name="point_less_safe">Less safe streets: %1$d/100 vs %2$d/100</string>
+    <string name="point_shorter_dark">Longest dark stretch %1$d m, against %2$d m</string>
+    <string name="point_longer_dark">Longest dark stretch %1$d m, against %2$d m</string>
+    <string name="point_more_open">About %1$d open places on the way, against %2$d</string>
+    <string name="point_fewer_open">About %1$d open places on the way, against %2$d</string>
     <string name="point_reliable">Times and fares are timetabled or official</string>
     <string name="point_estimates">Mostly estimates, so times may differ</string>
     <string name="point_long_wait">Long wait: %1$d min</string>
@@ -378,4 +382,29 @@
     <string name="report_reject">Reject</string>
     <string name="report_verified_body">Used when ranking routes that pass this place.</string>
     <string name="report_rejected_body">Not used.</string>
+
+    <!-- SOS and helplines -->
+    <string name="sos_button">SOS</string>
+    <string name="sos_title">Need help?</string>
+    <string name="sos_body">The call buttons open your phone\'s dialer with the number filled in. Nothing is dialled until you press call.</string>
+    <string name="sos_call_emergency">Call %1$s (emergency)</string>
+    <string name="sos_call_women">Call %1$s (women\'s helpline)</string>
+    <string name="sos_share">Share my location and trip</string>
+    <string name="sos_share_title">Share trip</string>
+    <string name="sos_share_text">I am on my way to %1$s and expect to arrive around %2$s. My location: %3$s (sent from the Raasta demo)</string>
+    <string name="sos_location_unknown">not available</string>
+    <string name="sos_nearest">Nearest open place: %1$s, %2$s away</string>
+    <string name="sos_nearest_none">No open place found nearby.</string>
+    <string name="place_shop">Shop</string>
+    <string name="place_food">Food place</string>
+    <string name="place_bank">Bank</string>
+    <string name="place_pharmacy">Pharmacy</string>
+    <string name="place_clinic">Clinic</string>
+    <string name="place_cinema">Cinema</string>
+    <string name="place_market">Market</string>
+    <string name="place_hospital">Hospital</string>
+    <string name="place_fuel">Fuel station</string>
+    <string name="place_police">Police station</string>
+    <string name="place_atm">Cash machine</string>
+    <string name="place_transit">Transit stop</string>
 </resources>

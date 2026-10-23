@@ -14,19 +14,27 @@ import kotlin.math.roundToInt
 
 enum class RouteVariant { SHORTEST, SAFEST }
 
-/** How much of a route runs through crime zones and busy streets. */
+/** How much of a route runs through crime zones, busy streets and dark stretches. */
 data class Exposure(
     val lengthM: Double = 0.0,
-    /** Sum of length x risk, so [score] is a length-weighted average. */
+    /** Sum of length x risk (dark stretches add extra), so [score] is a length-weighted average. */
     val riskM: Double = 0.0,
     val crimeZoneM: Double = 0.0,
     val busyM: Double = 0.0,
+    /** Length in dark stretches long enough to matter. */
+    val darkM: Double = 0.0,
+    val longestGapM: Double = 0.0,
+    val openPlaces: Int = 0,
+    val helpPoints: Int = 0,
+    val cameras: Int = 0,
 ) {
     operator fun plus(other: Exposure) = Exposure(
         lengthM + other.lengthM, riskM + other.riskM, crimeZoneM + other.crimeZoneM, busyM + other.busyM,
+        darkM + other.darkM, maxOf(longestGapM, other.longestGapM),
+        openPlaces + other.openPlaces, helpPoints + other.helpPoints, cameras + other.cameras,
     )
 
-    /** 100 = every metre is busy and outside crime zones. */
+    /** 100 = every metre is busy, has help nearby and is outside crime zones and dark stretches. */
     val score: Int get() = if (lengthM <= 0) 100 else (100 * (1 - riskM / lengthM)).roundToInt().coerceIn(0, 100)
     val busyShare: Double get() = if (lengthM <= 0) 0.0 else busyM / lengthM
     val crimeZoneShare: Double get() = if (lengthM <= 0) 0.0 else crimeZoneM / lengthM
@@ -38,7 +46,8 @@ data class Exposure(
     fun scaledTo(length: Double): Exposure {
         if (lengthM <= 0) return this
         val k = length / lengthM
-        return Exposure(length, riskM * k, crimeZoneM * k, busyM * k)
+        // Shares scale with length; counts and the longest gap describe the actual route.
+        return copy(lengthM = length, riskM = riskM * k, crimeZoneM = crimeZoneM * k, busyM = busyM * k, darkM = darkM * k)
     }
 }
 
@@ -61,12 +70,12 @@ class SafeRouter(val model: SafetyModel) {
         val b = graph.nearestNode(to, mode) ?: return null
         if (a == b) return null
         val shortestPath = router.route(a, b, mode) { graph.streets[it].lengthM } ?: return null
-        val shortest = streetRoute(shortestPath, from, to, hour)
+        val shortest = streetRoute(shortestPath, from, to, mode, hour)
         var safest = shortest
         // Full penalty first; soften it until the detour is acceptable.
         for (strength in STRENGTHS) {
             val path = router.route(a, b, mode) { model.safetyCost(it, hour, strength) } ?: break
-            val candidate = streetRoute(path, from, to, hour)
+            val candidate = streetRoute(path, from, to, mode, hour)
             if (candidate.lengthM <= shortest.lengthM * MAX_DETOUR + DETOUR_SLACK_M) {
                 safest = candidate
                 break
@@ -77,7 +86,7 @@ class SafeRouter(val model: SafetyModel) {
         return RoutePair(shortest, safest).also { cache[key] = it }
     }
 
-    private fun streetRoute(path: StreetPath, from: LatLon, to: LatLon, hour: Int): StreetRoute {
+    private fun streetRoute(path: StreetPath, from: LatLon, to: LatLon, mode: TravelMode, hour: Int): StreetRoute {
         val points = ArrayList<LatLon>()
         points += from
         var exposure = Exposure()
@@ -93,6 +102,15 @@ class SafeRouter(val model: SafetyModel) {
             )
         }
         points += to
+        val night = NightActivity.summarise(model, path.streets, hour)
+        exposure += Exposure(
+            riskM = night.darkM * NightActivity.darkWeight(mode),
+            darkM = night.darkM,
+            longestGapM = night.longestGapM,
+            openPlaces = night.openPlaces,
+            helpPoints = night.helpPoints,
+            cameras = night.cameras,
+        )
         // The bits from the exact place to the nearest street count towards length but not exposure.
         val connectors = distanceM(from, graph.nodes[path.nodes.first()]) + distanceM(graph.nodes[path.nodes.last()], to)
         return StreetRoute(points, exposure.lengthM + connectors, path.streets, exposure)

@@ -29,6 +29,7 @@ import com.raasta.app.planner.Leg
 import com.raasta.app.planner.Mode
 import com.raasta.app.planner.PlanResult
 import com.raasta.app.planner.RankedJourney
+import com.raasta.app.planner.StreetFacts
 import com.raasta.app.planner.StreetSafety
 import com.raasta.app.planner.Tradeoffs
 import com.raasta.app.planner.TravelPreferences
@@ -41,9 +42,12 @@ import com.raasta.app.safety.CrimeLayer
 import com.raasta.app.safety.JourneyRoutes
 import com.raasta.app.safety.JourneySafety
 import com.raasta.app.safety.RouteVariant
+import com.raasta.app.safety.SafeStop
 import com.raasta.app.safety.SafeRouter
 import com.raasta.app.safety.SafetyModel
 import com.raasta.app.safety.StreetGraph
+import com.raasta.app.safety.hourOf
+import com.raasta.app.safety.nearestOpenStop
 import com.raasta.app.store.FeedbackLog
 import com.raasta.app.store.JourneyFeedback
 import com.raasta.app.store.PreferencesStore
@@ -61,6 +65,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import kotlin.math.roundToInt
 
 /** Where the rider is within a trip at a given minute. */
 data class TripProgress(
@@ -321,6 +326,19 @@ class TripViewModel(app: Application) : AndroidViewModel(app) {
         return comparisons[journey]?.exposure(routeVariant)?.score
     }
 
+    /** Longest dark stretch and open places on the chosen streets of [journey], under the same conditions as [safetyScore]. */
+    fun streetFacts(journey: Journey): StreetFacts? {
+        if (!preferences.safetyAware) return null
+        val exposure = comparisons[journey]?.exposure(routeVariant) ?: return null
+        return StreetFacts(exposure.longestGapM.roundToInt(), exposure.openPlaces)
+    }
+
+    /** The closest open place to [at] right now where a rider can ask for help, once the street data has loaded. */
+    fun nearbyStop(at: LatLon): SafeStop? {
+        val ready = safetyStatus as? SafetyStatus.Ready ?: return null
+        return ready.model.graph.nearestOpenStop(at, hourOf(tripMinute.toInt()))
+    }
+
     /** [journey] with the shortest or safety streets the rider picked. */
     fun chosen(journey: Journey): Journey = comparisons[journey]?.journey(routeVariant) ?: journey
 
@@ -334,6 +352,8 @@ class TripViewModel(app: Application) : AndroidViewModel(app) {
             evidence,
             safetyScore(option.journey),
             reference?.let { safetyScore(it.journey) },
+            streetFacts(option.journey),
+            reference?.let { streetFacts(it.journey) },
         )
     }
 

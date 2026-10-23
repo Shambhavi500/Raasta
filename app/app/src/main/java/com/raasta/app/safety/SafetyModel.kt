@@ -7,15 +7,36 @@ import kotlin.math.exp
 import kotlin.math.floor
 
 /**
- * How safe each street feels at a given hour, from two things: crime level (from [crime])
- * and how many people are likely around (road type plus nearby places that are open).
- * These are estimates for ranking routes, not measurements.
+ * How safe each street feels at a given hour, from three things: crime level (from [crime]),
+ * how many people are likely around (road type plus nearby places that are open) and whether help
+ * is close (late-night help points, cameras, transit). It also spots dark streets: side streets
+ * with nothing open, no camera and no transit stop. These are estimates for ranking routes,
+ * not measurements.
  */
 class SafetyModel(val graph: StreetGraph, val crime: CrimeLayer?) {
     private val crimeLevels = DoubleArray(graph.streets.size) { s -> crime?.levelAt(graph.midpoint(s)) ?: 0.0 }
+    private val oversights = DoubleArray(graph.streets.size) { s ->
+        val street = graph.streets[s]
+        val raw = HELP_WEIGHT * street.lateHelp + ALL_DAY_WEIGHT * street.allDay +
+            CAMERA_WEIGHT * street.cameras + TRANSIT_WEIGHT * street.transit
+        1 - exp(-raw / OVERSIGHT_SCALE)
+    }
     private val activityByHour = ConcurrentHashMap<Int, List<ActivityCell>>()
 
     fun crimeLevel(street: Int): Double = crimeLevels[street]
+
+    /** 0 = no help point, camera or transit stop nearby, 1 = plenty. */
+    fun oversight(street: Int): Double = oversights[street]
+
+    /** A side street with nothing open, no camera and no transit stop, so nobody is likely to be around. */
+    fun isDark(street: Int, hour: Int): Boolean {
+        val s = graph.streets[street]
+        return s.roadClass !in MAIN_ROADS && s.openByHour[hour] == 0 && s.cameras == 0 && s.transit == 0
+    }
+
+    /** Share of [oversight] that counts at [hour]; help matters less in daylight. */
+    private fun reliefAt(street: Int, hour: Int): Double =
+        OVERSIGHT_RELIEF * oversights[street] * if (isNight(hour)) 1.0 else DAYTIME_OVERSIGHT
 
     /** 0 = likely empty, 1 = busy. */
     fun crowd(street: Int, hour: Int): Double {
@@ -28,17 +49,19 @@ class SafetyModel(val graph: StreetGraph, val crime: CrimeLayer?) {
     /** 0 = safest, 1 = riskiest. Without crime data only the crowd counts. */
     fun risk(street: Int, hour: Int): Double {
         val empty = 1 - crowd(street, hour)
-        if (crime == null) return empty
-        return CRIME_SHARE * crimeLevel(street) + (1 - CRIME_SHARE) * empty
+        val base = if (crime == null) empty else CRIME_SHARE * crimeLevel(street) + (1 - CRIME_SHARE) * empty
+        return base * (1 - reliefAt(street, hour))
     }
 
     /**
-     * Edge weight for the safety route: length, made longer for crime and for empty streets.
+     * Edge weight for the safety route: length, made longer for crime, empty streets and dark streets.
      * [strength] 1 is the full penalty; lower values trade safety for a shorter detour.
      */
     fun safetyCost(street: Int, hour: Int, strength: Double): Double {
         val s = graph.streets[street]
-        val penalty = CRIME_PENALTY * crimeLevel(street) + emptyPenalty(hour) * (1 - crowd(street, hour))
+        val empty = emptyPenalty(hour) * (1 - crowd(street, hour)) * (1 - reliefAt(street, hour))
+        val dark = if (isDark(street, hour)) darkPenalty(hour) else 0.0
+        val penalty = CRIME_PENALTY * crimeLevel(street) + empty + dark
         return s.lengthM * (1 + strength * penalty)
     }
 
@@ -64,6 +87,19 @@ class SafetyModel(val graph: StreetGraph, val crime: CrimeLayer?) {
         private const val PLACES_SCALE = 4.0
         const val CELL_M = 250.0
 
+        private const val HELP_WEIGHT = 1.0
+        private const val ALL_DAY_WEIGHT = 0.5
+        private const val CAMERA_WEIGHT = 0.6
+        private const val TRANSIT_WEIGHT = 0.2
+        /** About 1.5 weighted help points make a street well covered. */
+        private const val OVERSIGHT_SCALE = 1.5
+        /** Most that help points, cameras and transit can lower a street's risk. */
+        private const val OVERSIGHT_RELIEF = 0.35
+        private const val DAYTIME_OVERSIGHT = 0.4
+
+        /** Traffic keeps these roads from being dark even when no shop is open. */
+        private val MAIN_ROADS = setOf(RoadClass.TRUNK, RoadClass.PRIMARY, RoadClass.SECONDARY)
+
         /** Share of the busiest street's activity a road type has on its own, in the daytime. */
         private val ROAD_ACTIVITY = mapOf(
             RoadClass.TRUNK to 0.55,
@@ -88,7 +124,12 @@ class SafetyModel(val graph: StreetGraph, val crime: CrimeLayer?) {
         }
 
         /** Empty streets matter more after dark. */
-        fun emptyPenalty(hour: Int): Double = if (hour >= 20 || hour < 6) 2.5 else 1.5
+        fun emptyPenalty(hour: Int): Double = if (isNight(hour)) 2.5 else 1.5
+
+        /** Extra cost for a dark street; the reel's "dark gaps" idea. */
+        fun darkPenalty(hour: Int): Double = if (isNight(hour)) 1.5 else 0.5
+
+        fun isNight(hour: Int): Boolean = hour >= 20 || hour < 6
     }
 }
 

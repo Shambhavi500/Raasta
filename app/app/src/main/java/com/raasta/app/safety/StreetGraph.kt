@@ -32,17 +32,38 @@ class Street(
     val openByHour: IntArray,
     /** Shape points between [a] and [b]. */
     val via: List<LatLon> = emptyList(),
+    /** Nearby places open all 24 hours. */
+    val allDay: Int = 0,
+    /** Nearby police, hospital, fuel or pharmacy that stay open after midnight. */
+    val lateHelp: Int = 0,
+    /** Nearby bus stops and stations. */
+    val transit: Int = 0,
+    /** Nearby cameras mapped in OpenStreetMap (coverage is incomplete). */
+    val cameras: Int = 0,
 ) {
     fun allows(mode: TravelMode): Boolean = if (mode == TravelMode.WALK) foot else car
 }
 
+/** Kinds of place, in the order tools/safety/build_safety.py writes them. */
+enum class PlaceKind(val isHelp: Boolean = false) {
+    SHOP, FOOD, BANK, PHARMACY(true), CLINIC, CINEMA, MARKETPLACE, HOSPITAL(true), FUEL(true), POLICE(true), ATM, TRANSIT,
+}
+
 /** A shop, food place, service or transit stop; bit h of [hourMask] is set when it is open in hour h. */
-data class ActivityPoint(val at: LatLon, val hourMask: Int) {
+data class ActivityPoint(val at: LatLon, val hourMask: Int, val kind: PlaceKind = PlaceKind.SHOP) {
     fun openAt(hour: Int): Boolean = hourMask shr hour and 1 == 1
 }
 
 @Serializable
-data class GraphMeta(val generatedOn: String, val classes: List<String>, val sources: List<Source>)
+data class GraphMeta(
+    val generatedOn: String,
+    val classes: List<String>,
+    val sources: List<Source>,
+    /** Cameras mapped in OpenStreetMap inside the corridor. */
+    val cameras: Int = 0,
+    /** Places whose opening hours come from OpenStreetMap rather than typical hours by type. */
+    val hoursTagged: Int = 0,
+)
 
 /** The corridor's street network for routing, built offline from OpenStreetMap. */
 class StreetGraph(
@@ -115,7 +136,7 @@ class StreetGraph(
         /** About 330 m, so a 3 x 3 block always covers [SNAP_MAX_M]. */
         private const val CELL_DEG = 0.003
         const val SNAP_MAX_M = 300.0
-        private const val MAGIC = "RSG1"
+        private const val MAGIC = "RSG2"
         private val json = Json { ignoreUnknownKeys = true }
 
         /** Reads the binary file written by tools/safety/build_safety.py. */
@@ -133,11 +154,22 @@ class StreetGraph(
                 val roadClass = RoadClass.entries[data.readByte().toInt()]
                 val flags = data.readByte().toInt()
                 val open = IntArray(24) { data.readUnsignedByte() }
+                val allDay = data.readUnsignedByte()
+                val lateHelp = data.readUnsignedByte()
+                val transit = data.readUnsignedByte()
+                val cameras = data.readUnsignedByte()
                 val via = List(data.readUnsignedShort()) { LatLon(data.readInt() / E6, data.readInt() / E6) }
-                Street(a, b, length, roadClass, flags and 1 != 0, flags and 2 != 0, flags and 4 != 0, open, via)
+                Street(
+                    a, b, length, roadClass, flags and 1 != 0, flags and 2 != 0, flags and 4 != 0, open, via,
+                    allDay, lateHelp, transit, cameras,
+                )
             }
             val places = List(data.readInt()) {
-                ActivityPoint(LatLon(data.readInt() / E6, data.readInt() / E6), data.readInt())
+                ActivityPoint(
+                    LatLon(data.readInt() / E6, data.readInt() / E6),
+                    data.readInt(),
+                    PlaceKind.entries[data.readByte().toInt()],
+                )
             }
             return StreetGraph(nodes, streets, places, meta)
         }

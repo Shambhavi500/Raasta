@@ -54,6 +54,15 @@ class JourneySafetyTest {
     }
 
     @Test
+    fun bundledGraphCarriesTheNightData() {
+        assertTrue(graph.streets.any { it.lateHelp > 0 })
+        assertTrue(graph.streets.any { it.transit > 0 })
+        assertTrue(graph.places.map { it.kind }.toSet().size > 3)
+        // Cameras are counted only if OpenStreetMap maps any in the corridor.
+        assertEquals(graph.meta.cameras > 0, graph.streets.any { it.cameras > 0 })
+    }
+
+    @Test
     fun autoAllTheWayHasStreetRoutes() {
         val direct = planner.journeys("wtc", "deccan", 22 * 60).first.first { it.kind == JourneyKind.AUTO_DIRECT }
         val pair = safety.routesFor(direct.legs.single())

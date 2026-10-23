@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.ReportProblem
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -60,6 +61,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
@@ -86,6 +88,7 @@ import com.raasta.app.ui.TripViewModel
 import com.raasta.app.ui.common.MapButton
 import com.raasta.app.ui.common.MapSheet
 import com.raasta.app.ui.theme.AttentionAmber
+import com.raasta.app.ui.theme.DangerRed
 import com.raasta.app.ui.theme.ElectricLime
 import com.raasta.app.ui.theme.ErrorOnDark
 import com.raasta.app.ui.theme.Obsidian
@@ -112,6 +115,7 @@ fun JourneyScreen(vm: TripViewModel, onArrived: () -> Unit, onEnded: () -> Unit)
     var overviewToken by remember { mutableIntStateOf(0) }
     var confirmEnd by remember { mutableStateOf(false) }
     var choosingProblem by remember { mutableStateOf(false) }
+    var sosOpen by remember { mutableStateOf(false) }
     var recovery by remember { mutableStateOf<RecoveryResult?>(null) }
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -217,6 +221,14 @@ fun JourneyScreen(vm: TripViewModel, onArrived: () -> Unit, onEnded: () -> Unit)
                         )
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Button(
+                            onClick = { sosOpen = true },
+                            colors = ButtonDefaults.buttonColors(containerColor = DangerRed, contentColor = Color.White),
+                        ) {
+                            Icon(Icons.Filled.Shield, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(stringResource(R.string.sos_button), fontWeight = FontWeight.Bold)
+                        }
                         if (leg.mode == Mode.WALK) {
                             val from = vm.places.locate(leg.from)
                             val to = vm.places.locate(leg.to)
@@ -275,6 +287,17 @@ fun JourneyScreen(vm: TripViewModel, onArrived: () -> Unit, onEnded: () -> Unit)
                 }
             }
         }
+    }
+
+    if (sosOpen) {
+        val here = position ?: vm.places.locate(leg.from)
+        SosSheet(
+            journey = journey,
+            destination = vm.destinationName.substringBefore(","),
+            at = here,
+            stop = here?.let { vm.nearbyStop(it) },
+            onDismiss = { sosOpen = false },
+        )
     }
 
     if (choosingProblem) {

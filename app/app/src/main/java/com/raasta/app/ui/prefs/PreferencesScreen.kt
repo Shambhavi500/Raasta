@@ -57,6 +57,8 @@ import com.raasta.app.ui.TripViewModel
 import com.raasta.app.ui.plan.clock
 import com.raasta.app.ui.plan.goalDescription
 import com.raasta.app.ui.plan.goalLabel
+import com.raasta.app.safety.SafetyModel
+import com.raasta.app.safety.hourOf
 import com.raasta.app.ui.theme.ElectricLime
 import com.raasta.app.ui.theme.Obsidian
 
@@ -64,7 +66,12 @@ import com.raasta.app.ui.theme.Obsidian
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PreferencesScreen(vm: TripViewModel, onBack: () -> Unit, onFindRoutes: () -> Unit) {
-    var preferences by remember { mutableStateOf(vm.preferences) }
+    // Leaving at night with no saved choice: start with safety-aware routing on.
+    var preferences by remember {
+        val start = vm.preferences
+        val night = SafetyModel.isNight(hourOf(vm.startMinute))
+        mutableStateOf(if (night && !vm.hasSavedPreferences) start.copy(safetyAware = true) else start)
+    }
     val leaving = vm.departAt?.let { stringResource(R.string.depart_at_time, clock(it)) }
         ?: stringResource(R.string.leave_now_short)
 

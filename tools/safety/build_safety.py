@@ -4,6 +4,8 @@ Fetches from OpenStreetMap (Overpass API) for the demo corridor:
   * the street network (walkable and drivable ways), split into a routing graph
   * places that bring people to a street (shops, food, services, transit stops)
     with their opening hours, so "how busy" can change with the time of day
+  * help points (police, hospital, fuel, pharmacy) that stay open late, transit stops
+    and publicly mapped surveillance cameras, counted per street for the night score
 
 Writes:
   * app/app/src/main/assets/street_graph.bin  routing graph + people-activity data
@@ -63,6 +65,8 @@ SKIP_SERVICE = {"parking_aisle", "driveway", "drive-through"}
 
 # A place counts towards a street when it is this close to it.
 POI_NEAR_M = 40
+CAMERA_NEAR_M = 50
+FULL_DAY = (1 << 24) - 1
 
 # Typical hours (24 h clock) when OSM has no usable opening_hours tag.
 # Assumptions for Pune, not measured; listed in the app's data notes.
@@ -74,7 +78,10 @@ DEFAULT_HOURS = {
     "clinic": (9, 21),
     "cinema": (10, 24),
     "marketplace": (7, 21),
-    "allday": (0, 24),
+    "hospital": (0, 24),
+    "fuel": (0, 24),
+    "police": (0, 24),
+    "atm": (0, 24),
     "transit": (6, 23),
 }
 AMENITY_KIND = {
@@ -82,9 +89,14 @@ AMENITY_KIND = {
     "ice_cream": "food", "bar": "food", "pub": "food",
     "bank": "bank", "pharmacy": "pharmacy", "clinic": "clinic", "doctors": "clinic",
     "cinema": "cinema", "marketplace": "marketplace",
-    "hospital": "allday", "fuel": "allday", "police": "allday", "atm": "allday",
+    "hospital": "hospital", "fuel": "fuel", "police": "police", "atm": "atm",
     "bus_station": "transit",
 }
+# Order of the kind byte the app's PlaceKind enum reads.
+KINDS = ["shop", "food", "bank", "pharmacy", "clinic", "cinema", "marketplace",
+         "hospital", "fuel", "police", "atm", "transit"]
+# Places a person could walk into for help late at night.
+HELP_KINDS = {"pharmacy", "hospital", "fuel", "police"}
 
 # Demo crime layer. Fixed seed so every build gives the same zones.
 CRIME_SEED = 20261024
@@ -256,6 +268,10 @@ def poi_kind(tags):
     return None
 
 
+def build_cameras(data):
+    return [(e["lat"], e["lon"]) for e in data["elements"] if e["type"] == "node" and "lat" in e]
+
+
 def build_pois(data):
     pois = []
     for e in data["elements"]:
@@ -275,8 +291,7 @@ def build_pois(data):
     return pois
 
 
-def open_counts(nodes, edges, pois):
-    """For each edge, how many nearby places are open in each hour of the day."""
+def street_grid(nodes, edges):
     cell = 0.0005  # about 55 m
     grid = defaultdict(list)
     for i, e in enumerate(edges):
@@ -285,50 +300,71 @@ def open_counts(nodes, edges, pois):
             for cx in range(int(min(p[1], q[1]) / cell) - 1, int(max(p[1], q[1]) / cell) + 2):
                 for cy in range(int(min(p[0], q[0]) / cell) - 1, int(max(p[0], q[0]) / cell) + 2):
                     grid[(cx, cy)].append((i, p, q))
-    counts = [[0] * 24 for _ in edges]
+    return grid, cell
+
+
+def streets_near(grid, cell, lat, lon, within_m):
+    """Indices of the streets passing within [within_m] metres of a point."""
     k = 111320.0
+    near = set()
+    for i, p, q in grid.get((int(lon / cell), int(lat / cell)), ()):
+        if i in near:
+            continue
+        # Flat-earth distance to the segment is fine at these distances.
+        cos = math.cos(math.radians(lat))
+        px, py = (lon - p[1]) * k * cos, (lat - p[0]) * k
+        dx, dy = (q[1] - p[1]) * k * cos, (q[0] - p[0]) * k
+        t = max(0.0, min(1.0, (px * dx + py * dy) / (dx * dx + dy * dy))) if dx or dy else 0.0
+        if math.hypot(px - t * dx, py - t * dy) <= within_m:
+            near.add(i)
+    return near
+
+
+def street_counts(nodes, edges, pois, cameras):
+    """Per street: places open in each hour, plus all-day places, late help points, transit stops and cameras."""
+    grid, cell = street_grid(nodes, edges)
+    counts = [[0] * 24 for _ in edges]
+    extra = [[0, 0, 0, 0] for _ in edges]  # all-day, late help, transit, cameras
     for poi in pois:
-        key = (int(poi["lon"] / cell), int(poi["lat"] / cell))
-        near = set()
-        for i, p, q in grid.get(key, ()):
-            if i in near:
-                continue
-            # Flat-earth distance to the segment is fine at 40 m.
-            cos = math.cos(math.radians(poi["lat"]))
-            px, py = (poi["lon"] - p[1]) * k * cos, (poi["lat"] - p[0]) * k
-            dx, dy = (q[1] - p[1]) * k * cos, (q[0] - p[0]) * k
-            t = max(0.0, min(1.0, (px * dx + py * dy) / (dx * dx + dy * dy))) if dx or dy else 0.0
-            if math.hypot(px - t * dx, py - t * dy) <= POI_NEAR_M:
-                near.add(i)
-        for i in near:
+        for i in streets_near(grid, cell, poi["lat"], poi["lon"], POI_NEAR_M):
             row = counts[i]
             for hour in range(24):
                 if poi["mask"] >> hour & 1:
                     row[hour] = min(255, row[hour] + 1)
-    return counts
+            if poi["mask"] == FULL_DAY:
+                extra[i][0] = min(255, extra[i][0] + 1)
+            if poi["kind"] in HELP_KINDS and poi["mask"] & 1:  # still open after midnight
+                extra[i][1] = min(255, extra[i][1] + 1)
+            if poi["kind"] == "transit":
+                extra[i][2] = min(255, extra[i][2] + 1)
+    for lat, lon in cameras:
+        for i in streets_near(grid, cell, lat, lon, CAMERA_NEAR_M):
+            extra[i][3] = min(255, extra[i][3] + 1)
+    return counts, extra
 
 
 def e6(value):
     return int(round(value * 1_000_000))
 
 
-def write_graph(nodes, edges, counts, pois, meta):
-    out = bytearray(b"RSG1")
+def write_graph(nodes, edges, counts, extra, pois, meta):
+    out = bytearray(b"RSG2")
     meta_bytes = json.dumps(meta, separators=(",", ":")).encode("utf-8")
     out += struct.pack(">H", len(meta_bytes)) + meta_bytes  # Java DataInput.readUTF
     out += struct.pack(">i", len(nodes))
     for lat, lon in nodes:
         out += struct.pack(">ii", e6(lat), e6(lon))
     out += struct.pack(">i", len(edges))
-    for e, row in zip(edges, counts):
+    for e, row, more in zip(edges, counts, extra):
         out += struct.pack(">iifbb", e["a"], e["b"], e["len"], e["cls"], e["flags"])
         out += bytes(row)
+        out += bytes(more)
         out += struct.pack(">H", len(e["geom"]))
         for lat, lon in e["geom"]:
             out += struct.pack(">ii", e6(lat), e6(lon))
     out += struct.pack(">i", len(pois))
     for poi in pois:
-        out += struct.pack(">iii", e6(poi["lat"]), e6(poi["lon"]), poi["mask"])
+        out += struct.pack(">iiib", e6(poi["lat"]), e6(poi["lon"]), poi["mask"], KINDS.index(poi["kind"]))
     GRAPH_OUT.write_bytes(bytes(out))
 
 
@@ -390,12 +426,24 @@ def main():
     """)
     pois = build_pois(places)
     print(f"  {len(pois)} places, {sum(p['tagged'] for p in pois)} with opening hours in OSM")
-    counts = open_counts(nodes, edges, pois)
+
+    print("Fetching surveillance cameras ...")
+    camera_data = overpass("cameras", f"""
+        [out:json][timeout:120];
+        node["man_made"="surveillance"]({bbox});
+        out;
+    """)
+    cameras = build_cameras(camera_data)
+    print(f"  {len(cameras)} cameras mapped in OSM")
+    counts, extra = street_counts(nodes, edges, pois, cameras)
 
     meta = {
         "generatedOn": RETRIEVED,
         "bbox": [SOUTH, WEST, NORTH, EAST],
         "classes": CLASSES,
+        "kinds": KINDS,
+        "cameras": len(cameras),
+        "hoursTagged": sum(p["tagged"] for p in pois),
         "sources": [{
             "id": "osm_streets",
             "title": "Streets and places from OpenStreetMap (Overpass API)",
@@ -410,10 +458,17 @@ def main():
             "retrieved": RETRIEVED,
             "note": f"From OSM where tagged ({sum(p['tagged'] for p in pois)} places); otherwise typical hours "
                     "by type, e.g. shops 10:00-22:00, food 08:00-23:00. People activity is an estimate.",
+        }, {
+            "id": "osm_cameras",
+            "title": "Surveillance cameras mapped in OpenStreetMap",
+            "url": "https://wiki.openstreetmap.org/wiki/Tag:man_made%3Dsurveillance",
+            "retrieved": RETRIEVED,
+            "note": f"{len(cameras)} cameras mapped by volunteers. Coverage is incomplete, so a street with "
+                    "no camera here is not necessarily unwatched.",
         }],
     }
     ASSETS.mkdir(parents=True, exist_ok=True)
-    write_graph(nodes, edges, counts, pois, meta)
+    write_graph(nodes, edges, counts, extra, pois, meta)
     print(f"Wrote {GRAPH_OUT.relative_to(ROOT)} ({GRAPH_OUT.stat().st_size // 1024} KB)")
     if "--keep-crime" in sys.argv and CRIME_OUT.exists():
         print(f"Kept {CRIME_OUT.relative_to(ROOT)}")
