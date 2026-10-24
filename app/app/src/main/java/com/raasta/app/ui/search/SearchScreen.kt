@@ -81,7 +81,7 @@ fun SearchScreen(vm: TripViewModel, editFrom: Boolean, onBack: () -> Unit, onDon
             it.id,
             it.name,
             stringResource(R.string.home_place_subtitle, it.metroStation, distanceLabel(distanceM(here, LatLon(it.lat, it.lon)))),
-            "${it.name} ${it.metroStation} Pune",
+            "${it.name} ${it.metroStation} Metro Pune",
         )
     }
     val query = if (editingFrom) fromQuery else toQuery
