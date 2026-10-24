@@ -34,9 +34,9 @@ flowchart LR
   G -. during trip .-> K[SOS, dialer, share sheet, mapped nearby place]
 ```
 
-See [the current product flow](docs/PRODUCT_FLOW.md) for each screen's entry conditions, user actions, data, empty/error states, next steps, and relevant tests. [The Raasta design guide](docs/DESIGN.md) documents the existing Compose visual language.
+The journey flow and visual language described here reflect the current Android demo.
 
-> The repository-root `design.md` is an unrelated design document and is not authoritative for this Android app. Use `docs/DESIGN.md` for Raasta.
+> The repository-root `design.md` is an unrelated design document and is not authoritative for this Android app.
 
 ## What the recommendation uses
 
@@ -55,7 +55,7 @@ See [the current product flow](docs/PRODUCT_FLOW.md) for each screen's entry con
 
 The bundled corridor file records `generatedOn: 2026-10-23`; each source also carries its own retrieval date. The synthetic crime asset records generation on 2026-10-24. These dates describe the checked-in snapshots, not a live refresh.
 
-The planner's weights are hand-set starting assumptions, not weights validated through a rider study. A high safety score is not a safety guarantee. Current safety-data and scoring limitations are described in more detail in [the product flow](docs/PRODUCT_FLOW.md) and [`tools/safety/README.md`](tools/safety/README.md).
+The planner's weights are hand-set starting assumptions, not weights validated through a rider study. A high safety score is not a safety guarantee. The safety-data limitations are summarized above.
 
 ## Architecture
 
