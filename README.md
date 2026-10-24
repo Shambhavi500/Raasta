@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/brand/raasta-logo.svg" alt="Raasta" width="180" />
+  <img src="docs/brand/raasta-logo.png" alt="Raasta app logo" width="180" />
   <h1>Raasta</h1>
   <p><strong>A Pune journey planner for comparing routes and recovering when connections fail.</strong></p>
 </div>
@@ -162,10 +162,10 @@ The app can build route options from its bundled corridor snapshot. Map tiles an
 Raasta uses a dark-first interface with lime green for primary actions, amber for cautions or incomplete evidence, and red for urgent actions. Route cards surface journey metrics and trade-offs; the map remains visible during map-led steps.
 
 <p align="center">
-  <img src="docs/brand/raasta-logo.svg" alt="Raasta project logo" width="220" />
+  <img src="docs/brand/raasta-logo.png" alt="Raasta app logo" width="220" />
 </p>
 
-The screenshots below show the current demonstration interface. They illustrate a fixed-corridor planning flow and simulated journey. Route and safety estimates are based on incomplete bundled data; the active journey screen does not track a real vehicle or passenger.
+The screenshots below show the demonstration interface before the latest logo placement in the sign-in screen and map header. They illustrate a fixed-corridor planning flow and simulated journey. Route and safety estimates are based on incomplete bundled data; the active journey screen does not track a real vehicle or passenger.
 
 | Journey planning | Travel preferences |
 |---|---|
@@ -236,7 +236,7 @@ The current deliverable is a fixed-corridor demonstration. Broader corridor cove
 - [`docs/PRODUCT_FLOW.md`](docs/PRODUCT_FLOW.md): passenger flow, implemented behavior, and current limitations.
 - [`docs/DESIGN.md`](docs/DESIGN.md): interface design system and evidence-language guidance.
 - [`tools/safety/README.md`](tools/safety/README.md): safety-data generation details.
-- [`docs/brand/raasta-logo.svg`](docs/brand/raasta-logo.svg): project logo.
+- [`docs/brand/raasta-logo.png`](docs/brand/raasta-logo.png): app logo supplied for the current branding.
 
 ## License and attribution
 

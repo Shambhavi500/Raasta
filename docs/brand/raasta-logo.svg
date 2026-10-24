@@ -1,11 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 548 120" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 96" role="img" aria-labelledby="title description">
   <title id="title">Raasta</title>
-  <desc id="description">Raasta logo with a custom road-shaped R monogram and lowercase wordmark.</desc>
+  <desc id="description">Raasta journey planner logo with a minimal route-inspired R and a refined wordmark.</desc>
 
-  <g transform="translate(10 8)" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M24 92V20h38a24 24 0 0 1 0 48H24l54 24" stroke="#151618" stroke-width="17"/>
-    <path d="M24 92V20h38a24 24 0 0 1 0 48H24l54 24" stroke="#D4F639" stroke-width="3" stroke-dasharray="1 10"/>
+  <!-- The route-shaped R stays legible at small sizes; lime marks the destination. -->
+  <g fill="none" stroke="#151618" stroke-linecap="round" stroke-linejoin="round" stroke-width="5">
+    <path d="M18 76V18h25a18 18 0 0 1 0 36H18m25 0 28 22"/>
   </g>
+  <circle cx="71" cy="76" r="4.5" fill="#D4F639"/>
 
-  <text x="132" y="84" fill="#151618" font-family="Inter, Avenir Next, Montserrat, Arial, sans-serif" font-size="70" font-weight="650" letter-spacing="-3.2">raasta</text>
+  <text x="112" y="68" fill="#151618" font-family="Inter, Avenir Next, Montserrat, Arial, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.8">Raasta</text>
 </svg>

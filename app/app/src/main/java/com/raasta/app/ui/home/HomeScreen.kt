@@ -1,5 +1,6 @@
 package com.raasta.app.ui.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -119,13 +121,23 @@ fun HomeScreen(
             MapButton(Icons.Filled.Person, stringResource(R.string.home_account), onClick = { showAccount = true })
             Spacer(Modifier.weight(1f))
             Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surface, shadowElevation = 6.dp) {
-                Text(
-                    stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = ElectricLime,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                )
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.raasta_logo),
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+                    )
+                    Text(
+                        stringResource(R.string.app_name),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = ElectricLime,
+                    )
+                }
             }
         }
 
