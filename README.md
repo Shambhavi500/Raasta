@@ -1,8 +1,7 @@
 <div align="center">
   <img src="docs/brand/raasta-logo.svg" alt="Raasta" width="180" />
   <h1>Raasta</h1>
-  <p><strong>A journey planner for choosing a route and recovering when a connection fails.</strong></p>
-  <p>Android demo for the Kharadi–Ramwadi–Aqua Line corridor in Pune</p>
+  <p><strong>A Pune journey planner for comparing routes and recovering when connections fail.</strong></p>
 </div>
 
 ---
