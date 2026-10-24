@@ -62,7 +62,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -119,7 +118,7 @@ fun JourneyScreen(vm: TripViewModel, onArrived: () -> Unit, onEnded: () -> Unit)
     var recovery by remember { mutableStateOf<RecoveryResult?>(null) }
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val reroutedMessage = stringResource(R.string.trip_rerouted)
     val uriHandler = LocalUriHandler.current
 
     LaunchedEffect(vm.arrived) { if (vm.arrived) onArrived() }
@@ -352,8 +351,7 @@ fun JourneyScreen(vm: TripViewModel, onArrived: () -> Unit, onEnded: () -> Unit)
                         vm.reroute(vm.chosen(option))
                         recovery = null
                         cameraMode = CameraMode.FOLLOW
-                        val message = context.getString(R.string.trip_rerouted)
-                        scope.launch { snackbar.showSnackbar(message) }
+                        scope.launch { snackbar.showSnackbar(reroutedMessage) }
                     },
                     onKeep = { recovery = null },
                 )
