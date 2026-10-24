@@ -1,0 +1,234 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-10-23T21:01:36Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 2631172071,
+  "lat": 18.5593454,
+  "lon": 73.8827943,
+  "tags": {
+    "man_made": "surveillance",
+    "surveillance:type": "camera"
+  }
+},
+{
+  "type": "node",
+  "id": 2631172088,
+  "lat": 18.5642452,
+  "lon": 73.8834153,
+  "tags": {
+    "camera:mount": "wall",
+    "camera:type": "fixed",
+    "man_made": "surveillance",
+    "surveillance:type": "camera",
+    "surveillance:zone": "building"
+  }
+},
+{
+  "type": "node",
+  "id": 5213712427,
+  "lat": 18.5651776,
+  "lon": 73.9141628,
+  "tags": {
+    "man_made": "surveillance"
+  }
+},
+{
+  "type": "node",
+  "id": 7896718600,
+  "lat": 18.5641198,
+  "lon": 73.8833994,
+  "tags": {
+    "man_made": "surveillance",
+    "surveillance:type": "camera"
+  }
+},
+{
+  "type": "node",
+  "id": 7896718601,
+  "lat": 18.5639489,
+  "lon": 73.8833777,
+  "tags": {
+    "man_made": "surveillance",
+    "surveillance:type": "camera"
+  }
+},
+{
+  "type": "node",
+  "id": 7896718611,
+  "lat": 18.5619791,
+  "lon": 73.8831945,
+  "tags": {
+    "man_made": "surveillance",
+    "surveillance:type": "camera"
+  }
+},
+{
+  "type": "node",
+  "id": 10303698483,
+  "lat": 18.5316459,
+  "lon": 73.8299705,
+  "tags": {
+    "camera:mount": "pole",
+    "camera:type": "dome",
+    "man_made": "surveillance",
+    "surveillance": "traffic",
+    "surveillance:type": "camera",
+    "surveillance:zone": "traffic"
+  }
+},
+{
+  "type": "node",
+  "id": 10315959870,
+  "lat": 18.5612235,
+  "lon": 73.8141197,
+  "tags": {
+    "camera:direction": "354",
+    "camera:mount": "pole",
+    "camera:type": "fixed",
+    "man_made": "surveillance",
+    "surveillance": "outdoor",
+    "surveillance:type": "camera",
+    "surveillance:zone": "traffic"
+  }
+},
+{
+  "type": "node",
+  "id": 10315959871,
+  "lat": 18.5612140,
+  "lon": 73.8141264,
+  "tags": {
+    "camera:direction": "112",
+    "camera:mount": "pole",
+    "camera:type": "fixed",
+    "man_made": "surveillance",
+    "surveillance": "outdoor",
+    "surveillance:type": "camera",
+    "surveillance:zone": "traffic"
+  }
+},
+{
+  "type": "node",
+  "id": 10536434110,
+  "lat": 18.5316399,
+  "lon": 73.8300966,
+  "tags": {
+    "camera:mount": "pole",
+    "camera:type": "dome",
+    "man_made": "surveillance",
+    "surveillance": "traffic",
+    "surveillance:type": "camera",
+    "surveillance:zone": "traffic"
+  }
+},
+{
+  "type": "node",
+  "id": 10538696790,
+  "lat": 18.5606305,
+  "lon": 73.8092260,
+  "tags": {
+    "camera:mount": "pole",
+    "camera:type": "dome",
+    "man_made": "surveillance",
+    "surveillance": "traffic",
+    "surveillance:type": "camera",
+    "surveillance:zone": "traffic"
+  }
+},
+{
+  "type": "node",
+  "id": 12299285909,
+  "lat": 18.5297666,
+  "lon": 73.8727876,
+  "tags": {
+    "camera:direction": "255",
+    "camera:mount": "ceiling",
+    "camera:type": "fixed",
+    "man_made": "surveillance",
+    "surveillance:type": "camera"
+  }
+},
+{
+  "type": "node",
+  "id": 12299285916,
+  "lat": 18.5297794,
+  "lon": 73.8726654,
+  "tags": {
+    "camera:direction": "81",
+    "camera:mount": "ceiling",
+    "camera:type": "fixed",
+    "man_made": "surveillance",
+    "surveillance:type": "camera"
+  }
+},
+{
+  "type": "node",
+  "id": 12299285921,
+  "lat": 18.5298004,
+  "lon": 73.8727834,
+  "tags": {
+    "camera:direction": "255",
+    "camera:mount": "ceiling",
+    "camera:type": "fixed",
+    "man_made": "surveillance",
+    "surveillance:type": "camera"
+  }
+},
+{
+  "type": "node",
+  "id": 12299285925,
+  "lat": 18.5297781,
+  "lon": 73.8725986,
+  "tags": {
+    "camera:mount": "ceiling",
+    "camera:type": "dome",
+    "man_made": "surveillance",
+    "surveillance:type": "camera"
+  }
+},
+{
+  "type": "node",
+  "id": 13583137998,
+  "lat": 18.5531082,
+  "lon": 73.8025024,
+  "tags": {
+    "camera:direction": "90",
+    "camera:mount": "wall",
+    "camera:type": "fixed",
+    "man_made": "surveillance",
+    "surveillance": "public",
+    "surveillance:type": "camera",
+    "surveillance:zone": "building"
+  }
+},
+{
+  "type": "node",
+  "id": 13602977710,
+  "lat": 18.5293635,
+  "lon": 73.8714390,
+  "tags": {
+    "camera:mount": "ceiling",
+    "camera:type": "dome",
+    "man_made": "surveillance",
+    "surveillance:type": "camera"
+  }
+},
+{
+  "type": "node",
+  "id": 13955560846,
+  "lat": 18.5146649,
+  "lon": 73.8795786,
+  "tags": {
+    "man_made": "surveillance",
+    "surveillance:type": "camera"
+  }
+}
+
+  ]
+}
