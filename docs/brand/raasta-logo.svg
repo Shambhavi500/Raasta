@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 176" role="img" aria-labelledby="title description">
+  <title id="title">Raasta</title>
+  <desc id="description">Raasta journey planner logo: a winding road inside a location marker, paired with the Raasta wordmark.</desc>
+
+  <!-- App icon mark -->
+  <g transform="translate(20 20)">
+    <rect width="136" height="136" rx="38" fill="#151618"/>
+    <path d="M68 17c-23.2 0-42 18.8-42 42 0 30.4 42 68 42 68s42-37.6 42-68c0-23.2-18.8-42-42-42Z" fill="#D4F639"/>
+    <path d="M67 35c-8 8-10 15-6 22 4 7 14 8 14 16 0 7-9 13-10 22-1 7 2 13 7 19" fill="none" stroke="#151618" stroke-width="14" stroke-linecap="round"/>
+    <path d="M67 35c-8 8-10 15-6 22 4 7 14 8 14 16 0 7-9 13-10 22-1 7 2 13 7 19" fill="none" stroke="#F4F4F0" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="2 12"/>
+  </g>
+
+  <!-- Wordmark -->
+  <g fill="#151618">
+    <text x="188" y="105" font-family="Inter, Avenir Next, Montserrat, Arial, sans-serif" font-size="76" font-weight="750" letter-spacing="-4.5">Raasta</text>
+  </g>
+  <circle cx="436" cy="119" r="5" fill="#D4F639"/>
+  <text x="192" y="143" fill="#76787E" font-family="Inter, Avenir Next, Montserrat, Arial, sans-serif" font-size="13" font-weight="650" letter-spacing="3.1">FIND YOUR WAY FORWARD</text>
+</svg>
