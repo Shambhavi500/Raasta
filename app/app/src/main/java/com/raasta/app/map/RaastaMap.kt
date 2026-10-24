@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
 import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.graphics.Point
@@ -79,34 +77,8 @@ sealed interface MapCamera {
     data object Free : MapCamera
 }
 
-/**
- * Standard OpenStreetMap tiles, turned into a night map with a colour filter:
- * invert, rotate hue back 180 degrees so water and parks keep their colours, then dim.
- */
-private val NightFilter = ColorMatrixColorFilter(
-    ColorMatrix(
-        floatArrayOf(
-            -1f, 0f, 0f, 0f, 255f,
-            0f, -1f, 0f, 0f, 255f,
-            0f, 0f, -1f, 0f, 255f,
-            0f, 0f, 0f, 1f, 0f,
-        ),
-    ).apply {
-        postConcat(
-            ColorMatrix(
-                floatArrayOf(
-                    -0.574f, 1.430f, 0.144f, 0f, 0f,
-                    0.426f, 0.430f, 0.144f, 0f, 0f,
-                    0.426f, 1.430f, -0.856f, 0f, 0f,
-                    0f, 0f, 0f, 1f, 0f,
-                ),
-            ),
-        )
-        postConcat(ColorMatrix().apply { setScale(0.82f, 0.84f, 0.9f, 1f) })
-    },
-)
-
-private val MapBackground = 0xFF0E0F11.toInt()
+/** Standard OpenStreetMap tiles, shown as they are so roads, labels and landmarks read clearly. */
+private val MapBackground = 0xFFEDEAE4.toInt()
 
 fun configureMaps(context: Context) {
     Configuration.getInstance().apply {
@@ -180,7 +152,6 @@ fun RaastaMap(
 private class MapHolder(private val context: Context) {
     val map: MapView = MapView(context).apply {
         setTileSource(TileSourceFactory.MAPNIK)
-        overlayManager.tilesOverlay.setColorFilter(NightFilter)
         setMultiTouchControls(true)
         zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
         isTilesScaledToDpi = true
@@ -192,7 +163,7 @@ private class MapHolder(private val context: Context) {
         overlayManager.tilesOverlay.loadingBackgroundColor = MapBackground
         overlayManager.tilesOverlay.loadingLineColor = MapBackground
         overlays += CopyrightOverlay(context).apply {
-            setTextColor(0x99FFFFFF.toInt())
+            setTextColor(0xCC333333.toInt())
             setAlignRight(true)
         }
         controller.setZoom(13.0)
